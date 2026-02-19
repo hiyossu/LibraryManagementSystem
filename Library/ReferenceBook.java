@@ -1,14 +1,15 @@
 package Library;
 
-public class Book extends LibraryItem implements isBorrowable{
+public class ReferenceBook extends LibraryItem implements isBorrowable{
     public String genre; 
     public String deweyDecimal;
     protected boolean canBorrow; 
 
-    public Book(String title, String type, String genre, String deweyDecimal){
+    public ReferenceBook(String title, String type, String genre, String deweyDecimal, boolean canBorrow){
         super(title, type);
         this.genre = genre; 
         this.deweyDecimal = deweyDecimal;
+        this.canBorrow = canBorrow; 
 
     }
 
@@ -19,7 +20,7 @@ public class Book extends LibraryItem implements isBorrowable{
 
     @Override 
     public boolean canBorrow() {
-        return true; 
+        return false; 
     }
 
     public String getTitle(){
