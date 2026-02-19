@@ -1,0 +1,14 @@
+# Ignore all Java .class files
+*.class
+
+# Ignore IDE-specific folders (IntelliJ, Eclipse, VS Code)
+.idea/
+.project
+.classpath
+.settings/
+bin/
+out/
+
+# Ignore OS-generated files
+.DS_Store
+Thumbs.db
