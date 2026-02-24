@@ -29,7 +29,9 @@ public class GUI extends JFrame {
     private JTextField txtGenre;
     private JTextField txtDewey;
     private JLabel lblStatus;
-    
+
+    private Color colorCreme = new Color(255, 253, 208); // Hex: #FFFDD0
+    private Color colorMaroon = new Color(128, 0, 0);    // Hex: #800000
 
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
@@ -57,13 +59,11 @@ public class GUI extends JFrame {
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         setContentPane(contentPane);
         contentPane.setLayout(null);
-
-        // Absolute Layout per instructions for WindowBuilder
-        contentPane.setLayout(null); 
+        contentPane.setBackground(colorCreme); // Creme color
 
         //Admin Indicator
         JLabel lblAdmin = new JLabel("ADMIN ACCESS");
-        lblAdmin.setBounds(425, 11, 120, 14);
+        lblAdmin.setBounds(430, 11, 120, 14);
         lblAdmin.setForeground(Color.RED);
         contentPane.add(lblAdmin);
 
@@ -91,10 +91,18 @@ public class GUI extends JFrame {
                 clearFields(); 
             }
         });
+
+        btnAdd.setBackground(colorMaroon); 
+        btnAdd.setForeground(Color.WHITE);
+        btnDashboard.setBackground(colorMaroon);
+        btnDashboard.setForeground(Color.WHITE);
+        btnClear.setBackground(colorMaroon);    
+        btnClear.setForeground(Color.WHITE);
         
         contentPane.add(btnAdd);
         contentPane.add(btnDashboard);
         contentPane.add(btnClear);
+
 
         // Status Label
        // Title
