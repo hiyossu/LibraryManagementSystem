@@ -1,8 +1,6 @@
-package GUI;
+package Library;
 
-import DB;
-import Library;
-
+import DB.*;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
