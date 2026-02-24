@@ -1,26 +1,17 @@
 package Library;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.JLabel;
-import javax.swing.JButton;
-import java.awt.Color;
+import java.awt.*;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.awt.event.ActionEvent;
-import java.awt.EventQueue;
+import DB.db; // Importing your database class
 
 public class GUI extends JFrame {
 
     private String windowTitle = "Library Management System";
     private int width = 550;
     private int height = 375;
-    private String themeColor = "Creme";
-    private String statusMessage = "Ready...";
     private JPanel contentPane;
     
     private JTextField txtTitle;
@@ -31,22 +22,18 @@ public class GUI extends JFrame {
 
     private Color colorCreme = new Color(255, 253, 208); 
     private Color colorMaroon = new Color(128, 0, 0);  
+
     public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    GUI frame = new GUI();
-                    frame.setVisible(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        EventQueue.invokeLater(() -> {
+            try {
+                GUI frame = new GUI();
+                frame.setVisible(true);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
     }
 
-    /**
-     * Create the frame.
-     */
     public GUI() {
         setTitle(windowTitle);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -63,82 +50,53 @@ public class GUI extends JFrame {
         lblAdmin.setForeground(colorMaroon);
         contentPane.add(lblAdmin);
 
+        // Buttons
         JButton btnAdd = new JButton("Add Record");
         btnAdd.setBounds(30, 50, 120, 30);
-        btnAdd.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-               addRecords(); 
-            }
-        });
+        btnAdd.addActionListener(e -> addRecords());
 
         JButton btnDashboard = new JButton("Dashboard");
         btnDashboard.setBounds(200, 50, 120, 30);
-        btnDashboard.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                displayDashboard(); 
-            }
-        });
+        btnDashboard.addActionListener(e -> displayDashboard());
 
         JButton btnClear = new JButton("Clear Fields");
         btnClear.setBounds(370, 50, 120, 30);
-        btnClear.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                clearFields(); 
-            }
-        });
+        btnClear.addActionListener(e -> clearFields());
 
-        btnAdd.setBackground(colorMaroon); 
-        btnAdd.setForeground(Color.WHITE);
-        btnDashboard.setBackground(colorMaroon);
-        btnDashboard.setForeground(Color.WHITE);
-        btnClear.setBackground(colorMaroon);    
-        btnClear.setForeground(Color.WHITE);
+        // Styling
+        styleButton(btnAdd);
+        styleButton(btnDashboard);
+        styleButton(btnClear);
         
         contentPane.add(btnAdd);
         contentPane.add(btnDashboard);
         contentPane.add(btnClear);
 
-        JLabel lblTitle = new JLabel("Title:");
-        lblTitle.setBounds(30, 100, 100, 25);
-        contentPane.add(lblTitle);
+        // Inputs
+        createField("Title:", 100, txtTitle = new JTextField());
+        createField("Type:", 130, txtType = new JTextField());
+        createField("Genre:", 160, txtGenre = new JTextField());
+        createField("Dewey:", 190, txtDewey = new JTextField());
 
-        txtTitle = new JTextField();
-        txtTitle.setBounds(150, 100, 200, 25);
-        contentPane.add(txtTitle);
-
-
-        JLabel lblType = new JLabel("Type:");
-        lblType.setBounds(30, 130, 100, 25);
-        contentPane.add(lblType);
-
-        txtType = new JTextField();
-        txtType.setBounds(150, 130, 200, 25);
-        contentPane.add(txtType);
-
-        JLabel lblGenre = new JLabel("Genre:");
-        lblGenre.setBounds(30, 160, 100, 25);
-        contentPane.add(lblGenre);
-
-        txtGenre = new JTextField();
-        txtGenre.setBounds(150, 160, 200, 25);
-        contentPane.add(txtGenre);
-
-
-        JLabel lblDewey = new JLabel("Dewey Decimal:");
-        lblDewey.setBounds(30, 190, 100, 25);
-        contentPane.add(lblDewey);
-
-        txtDewey = new JTextField();
-        txtDewey.setBounds(150, 190, 200, 25);
-        contentPane.add(txtDewey);
-
-
-        lblStatus = new JLabel("Status: " + statusMessage);
+        lblStatus = new JLabel("Status: Ready...");
         lblStatus.setBounds(30, 300, 400, 25);
         contentPane.add(lblStatus);
     }
 
+    private void styleButton(JButton btn) {
+        btn.setBackground(colorMaroon);
+        btn.setForeground(Color.WHITE);
+        btn.setOpaque(true);
+        btn.setBorderPainted(false);
+    }
 
+    private void createField(String labelText, int y, JTextField field) {
+        JLabel lbl = new JLabel(labelText);
+        lbl.setBounds(30, y, 100, 25);
+        contentPane.add(lbl);
+        field.setBounds(150, y, 200, 25);
+        contentPane.add(field);
+    }
 
     public void addRecords() {
         String title = txtTitle.getText().trim();
@@ -149,30 +107,26 @@ public class GUI extends JFrame {
         if (title.isEmpty() || type.isEmpty() || genre.isEmpty() || dewey.isEmpty()) {
             lblStatus.setForeground(Color.ORANGE); 
             lblStatus.setText("Status: Please complete the data inputs.");
-            
-            javax.swing.JOptionPane.showMessageDialog(this, "Please complete the data inputs.", "Empty Data", javax.swing.JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Please complete all fields.", "Empty Data", JOptionPane.WARNING_MESSAGE);
         } else {
-            try {
-                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbsample", "root", "");
-                String query = "INSERT INTO tblbooks (title, type, genre, dewey) VALUES (?, ?, ?, ?)";
-                PreparedStatement pstmt = conn.prepareStatement(query);
-                pstmt.setString(1, title);
-                pstmt.setString(2, type);
-                pstmt.setString(3, genre);
-                pstmt.setString(4, dewey);
-
-                pstmt.executeUpdate();
-                
+            // THE FIX: Use the 'db' class from the DB package
+            db database = new db(); 
+            
+            // Create a book object (Ensure your book.java constructor matches this)
+            // Assuming: book(String title, String type, String genre, String dewey, boolean borrowable)
+            book newBook = new book(title, type, genre, dewey, true);
+            
+            boolean success = database.addBook(newBook);
+            
+            if (success) {
                 lblStatus.setForeground(new Color(34, 139, 34));
                 lblStatus.setText("Status: Successfully added " + title);
-                
                 clearFields();
-                conn.close();
-            } catch (Exception ex) {
-                ex.printStackTrace();
+            } else {
                 lblStatus.setForeground(colorMaroon); 
-                lblStatus.setText("Status: Database Error! " + ex.getMessage());
+                lblStatus.setText("Status: Database Error! Check console.");
             }
+            database.closeConnection();
         }
     }
     
@@ -186,7 +140,4 @@ public class GUI extends JFrame {
         txtGenre.setText("");
         txtDewey.setText("");
     }
-    }
-
-
-
+}
