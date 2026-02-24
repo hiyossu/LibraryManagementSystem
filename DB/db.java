@@ -9,7 +9,7 @@ public class db {
 
     private static final String URL = "jdbc:mysql://localhost:3306/LibraryManagementSystem";
     private static final String USER = "root";
-    private static final String PASSWORD = "Fonsi113122";
+    private static final String PASSWORD = "Fons113122";
 
     private Connection connection;
 
