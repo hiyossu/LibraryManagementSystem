@@ -8,6 +8,9 @@ import javax.swing.JLabel;
 import javax.swing.JButton;
 import java.awt.Color;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.awt.event.ActionEvent;
 import java.awt.EventQueue;
 
@@ -81,17 +84,17 @@ public class GUI extends JFrame {
             }
         });
 
-        JButton btnCalendar = new JButton("Calendar");
-        btnCalendar.setBounds(370, 50, 120, 30);
-        btnCalendar.addActionListener(new ActionListener() {
+        JButton btnClear = new JButton("Clear Fields");
+        btnClear.setBounds(370, 50, 120, 30);
+        btnClear.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                displayCalendar(); 
+                clearFields(); 
             }
         });
         
         contentPane.add(btnAdd);
         contentPane.add(btnDashboard);
-        contentPane.add(btnCalendar);
+        contentPane.add(btnClear);
 
         // Status Label
        // Title
@@ -132,33 +135,62 @@ public class GUI extends JFrame {
 
         // Status Label
         lblStatus = new JLabel("Status: " + statusMessage);
-        lblStatus.setBounds(30, 300, 400, 14);
+        lblStatus.setBounds(30, 300, 400, 25);
         contentPane.add(lblStatus);
     }
 
 
     // UML Methods
-    public void addRecords() {
-        System.out.println("Connecting to dbsample..."); 
-        String title = txtTitle.getText();
-        String dewey = txtDewey.getText();
+public void addRecords() {
+    String title = txtTitle.getText().trim();
+    String type = txtType.getText().trim();
+    String genre = txtGenre.getText().trim();
+    String dewey = txtDewey.getText().trim();
 
-        if(!title.isEmpty() && !dewey.isEmpty()) {
-            lblStatus.setText("Status: Attempting to add " + title);
-            // Insert Database Logic here as seen in Practice Exercise #2
-        } else {
-            lblStatus.setText("Status: Error - Title and Dewey are required");
+    if (title.isEmpty() || type.isEmpty() || genre.isEmpty() || dewey.isEmpty()) {
+        // Validation Failed: Set to Orange (or Red)
+        lblStatus.setForeground(Color.ORANGE); 
+        lblStatus.setText("Status: Please complete the data inputs.");
+        
+        javax.swing.JOptionPane.showMessageDialog(this, "Please complete the data inputs.", "Empty Data", javax.swing.JOptionPane.WARNING_MESSAGE);
+    } else {
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbsample", "root", "");
+            String query = "INSERT INTO tblbooks (title, type, genre, dewey) VALUES (?, ?, ?, ?)";
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            pstmt.setString(1, title);
+            pstmt.setString(2, type);
+            pstmt.setString(3, genre);
+            pstmt.setString(4, dewey);
+
+            pstmt.executeUpdate();
+            
+            // Success: Set to Green
+            lblStatus.setForeground(new Color(0, 128, 0)); // Dark Green for better visibility
+            lblStatus.setText("Status: Successfully added " + title);
+            
+            clearFields();
+            conn.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            // Database Error: Set to Orange/Red
+            lblStatus.setForeground(Color.RED); 
+            lblStatus.setText("Status: Database Error! " + ex.getMessage());
         }
     }
+}
     
-
     public void displayDashboard() {
         System.out.println("Displaying Dashboard..."); 
     }
 
-    public void displayCalendar() {
-        System.out.println("Displaying Calendar..."); 
+    public void clearFields() {
+        txtTitle.setText("");
+        txtType.setText("");
+        txtGenre.setText("");
+        txtDewey.setText("");
+    }
     }
 
-}
+
 
