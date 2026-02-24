@@ -7,7 +7,7 @@ import java.util.List;
 
 public class db {
 
-    private static final String URL = "jdbc:mysql://localhost:3306/LibraryManagementSystem";
+    private static final String URL = "jdbc:mysql://localhost:3306/LibraryManagementSystem?allowPublicKeyRetrieval=true&useSSL=false";
     private static final String USER = "root";
     private static final String PASSWORD = "Fons113122";
 
@@ -28,7 +28,7 @@ public class db {
         String sql = "INSERT INTO Book (title, type, genre, deweyDecimal, canBorrow) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, b.getTitle());
-            stmt.setString(2, b.type);
+            stmt.setString(2, b.getType());
             stmt.setString(3, b.getGenre());
             stmt.setString(4, b.getDeweyDecimal());
             stmt.setBoolean(5, b.getBorrowable());
@@ -110,6 +110,7 @@ public class db {
             return false;
         }
     }
+    
 
     public void closeConnection() {
         try {

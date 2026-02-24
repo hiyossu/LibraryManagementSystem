@@ -36,6 +36,10 @@ public class book extends LibraryItem implements isBorrowable{
     public boolean getBorrowable(){
         return this.canBorrow; 
     }
+
+    public String getType() {
+        return this.type; 
+}
     
 }
 

@@ -1,11 +1,9 @@
 package Library;
 
+import DB.db;
+import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import DB.db; // Importing your database class
 
 public class GUI extends JFrame {
 
@@ -114,7 +112,7 @@ public class GUI extends JFrame {
             
             // Create a book object (Ensure your book.java constructor matches this)
             // Assuming: book(String title, String type, String genre, String dewey, boolean borrowable)
-            book newBook = new book(title, type, genre, dewey, true);
+            book newBook = new book(title, type, genre, dewey);
             
             boolean success = database.addBook(newBook);
             
