@@ -6,13 +6,8 @@ import java.awt.event.FocusEvent;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-/**
- * Factory for reusable Swing widgets.
- * All form cards and GUI.java call these instead of duplicating the code.
- */
 public class UIFactory {
 
-    // ── Shared colours injected once at startup ───────────────────────────
     private final Color gold;
     private final Color darkGold;
     private final Color red;
@@ -39,9 +34,6 @@ public class UIFactory {
         this.fieldBorder = fieldBorder;
     }
 
-    // ─────────────────────────────────────────────────────────────────────
-    //  TEXT FIELD
-    // ─────────────────────────────────────────────────────────────────────
     public JTextField makeField(String placeholder) {
         JTextField tf = new JTextField() {
             protected void paintComponent(Graphics g) {
@@ -69,23 +61,18 @@ public class UIFactory {
         tf.addFocusListener(new FocusAdapter() {
             public void focusGained(FocusEvent e) {
                 tf.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(gold, 1),
-                    new EmptyBorder(4, 10, 4, 10)));
+                    BorderFactory.createLineBorder(gold, 1), new EmptyBorder(4, 10, 4, 10)));
                 tf.repaint();
             }
             public void focusLost(FocusEvent e) {
                 tf.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(fieldBorder, 1),
-                    new EmptyBorder(4, 10, 4, 10)));
+                    BorderFactory.createLineBorder(fieldBorder, 1), new EmptyBorder(4, 10, 4, 10)));
                 tf.repaint();
             }
         });
         return tf;
     }
 
-    // ─────────────────────────────────────────────────────────────────────
-    //  LABEL + FIELD ROW
-    // ─────────────────────────────────────────────────────────────────────
     public void addRow(JPanel p, GridBagConstraints fc,
                        String labelText, JTextField field, int row) {
         fc.gridy = row; fc.gridx = 0; fc.weightx = 0; fc.gridwidth = 1;
@@ -95,15 +82,11 @@ public class UIFactory {
         lbl.setForeground(grayText);
         lbl.setPreferredSize(new Dimension(95, 20));
         p.add(lbl, fc);
-
         fc.gridx = 1; fc.weightx = 1; fc.gridwidth = 3;
         fc.insets = new Insets(8, 0, 8, 0);
         p.add(field, fc);
     }
 
-    // ─────────────────────────────────────────────────────────────────────
-    //  PRIMARY BUTTON  (gold fill)
-    // ─────────────────────────────────────────────────────────────────────
     public JButton makePrimaryButton(String text) {
         JButton btn = new JButton(text) {
             protected void paintComponent(Graphics g) {
@@ -126,9 +109,6 @@ public class UIFactory {
         return btn;
     }
 
-    // ─────────────────────────────────────────────────────────────────────
-    //  OUTLINE BUTTON  (dark outline, no fill)
-    // ─────────────────────────────────────────────────────────────────────
     public JButton makeOutlineButton(String text) {
         JButton btn = new JButton(text) {
             protected void paintComponent(Graphics g) {
@@ -153,21 +133,15 @@ public class UIFactory {
         return btn;
     }
 
-    // ─────────────────────────────────────────────────────────────────────
-    //  SHARED BUTTON ROW  (Add / Clear / Dashboard)
-    // ─────────────────────────────────────────────────────────────────────
     public JPanel makeButtonRow(Runnable onAdd, Runnable onClear, Runnable onDash) {
         JPanel buttons = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         buttons.setBackground(cardColor);
-
         JButton btnAdd   = makePrimaryButton("+ Add to Catalog");
         JButton btnClear = makeOutlineButton("Clear");
         JButton btnDash  = makeOutlineButton("Dashboard");
-
         btnAdd  .addActionListener(e -> onAdd  .run());
         btnClear.addActionListener(e -> onClear.run());
         btnDash .addActionListener(e -> onDash .run());
-
         buttons.add(btnAdd);
         buttons.add(Box.createHorizontalStrut(10));
         buttons.add(btnClear);

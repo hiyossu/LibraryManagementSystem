@@ -10,14 +10,8 @@ public abstract class LibraryItem {
         this.type  = type;
     }
 
-    // ── Getters ───────────────────────────────────────────────────────────
-    public String getTitle() { 
-        return title;
-     }
-    public String getType()  { 
-        return type;  
-    }
+    public String getTitle() { return title; }
+    public String getType()  { return type;  }
 
-    // ── Abstract ──────────────────────────────────────────────────────────
     public abstract double calculateLateFee();
 }
