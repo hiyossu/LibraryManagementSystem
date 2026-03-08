@@ -15,6 +15,7 @@ import java.io.InputStream;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.*;
+import java.time.LocalDate;
 
 public class GUI extends JFrame {
 
@@ -427,7 +428,155 @@ public class GUI extends JFrame {
             "Dashboard", JOptionPane.INFORMATION_MESSAGE);
     }
 
+<<<<<<< HEAD
     private void showAbout() {
+=======
+    private void addRow(JPanel p, GridBagConstraints fc, String labelText, JTextField field, int row) {
+        fc.gridy = row; fc.gridx = 0; fc.weightx = 0; fc.gridwidth = 1;
+        fc.insets = new Insets(8, 0, 8, 10);
+        JLabel lbl = new JLabel(labelText);
+        lbl.setFont(new Font("Dialog", Font.BOLD, 11));
+        lbl.setForeground(grayText);
+        lbl.setPreferredSize(new Dimension(95, 20));
+        p.add(lbl, fc);
+
+        fc.gridx = 1; fc.weightx = 1; fc.gridwidth = 3;
+        fc.insets = new Insets(8, 0, 8, 0);
+        p.add(field, fc);
+    }
+
+    private JTextField makeField(String placeholder) {
+        JTextField tf = new JTextField() {
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                if (getText().isEmpty() && !isFocusOwner()) {
+                    Graphics2D g2 = (Graphics2D) g.create();
+                    g2.setColor(grayText);
+                    g2.setFont(new Font("Dialog", Font.ITALIC, 12));
+                    Insets ins = getInsets();
+                    FontMetrics fm = g2.getFontMetrics();
+                    int y = ins.top + (getHeight() - ins.top - ins.bottom - fm.getHeight()) / 2 + fm.getAscent();
+                    g2.drawString(placeholder, ins.left + 4, y);
+                    g2.dispose();
+                }
+            }
+        };
+        tf.setFont(new Font("Dialog", Font.PLAIN, 13));
+        tf.setForeground(textColor);
+        tf.setBackground(fieldBg);
+        tf.setCaretColor(gold);
+        tf.setPreferredSize(new Dimension(0, 36));
+        tf.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(fieldBorder, 1),
+            new EmptyBorder(4, 10, 4, 10)));
+        tf.addFocusListener(new FocusAdapter() {
+            public void focusGained(FocusEvent e) {
+                tf.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(gold, 1), new EmptyBorder(4, 10, 4, 10)));
+                tf.repaint();
+            }
+            public void focusLost(FocusEvent e) {
+                tf.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(fieldBorder, 1), new EmptyBorder(4, 10, 4, 10)));
+                tf.repaint();
+            }
+        });
+        return tf;
+    }
+
+    private JButton makePrimaryButton(String text) {
+        JButton btn = new JButton(text) {
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                if      (getModel().isPressed())  g2.setColor(darkGold);
+                else if (getModel().isRollover()) g2.setColor(new Color(220, 172, 32));
+                else                              g2.setColor(gold);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 6, 6);
+                g2.dispose();
+                super.paintComponent(g);
+            }
+        };
+        btn.setFont(new Font("Dialog", Font.BOLD, 13));
+        btn.setForeground(new Color(21, 7, 7));
+        btn.setOpaque(false); btn.setContentAreaFilled(false);
+        btn.setBorderPainted(false); btn.setFocusPainted(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.setPreferredSize(new Dimension(155, 38));
+        return btn;
+    }
+
+    private JButton makeOutlineButton(String text) {
+        JButton btn = new JButton(text) {
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                if      (getModel().isPressed())  g2.setColor(divColor);
+                else if (getModel().isRollover()) g2.setColor(panelColor);
+                else                              g2.setColor(cardColor);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 6, 6);
+                g2.setColor(fieldBorder);
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 6, 6);
+                g2.dispose();
+                super.paintComponent(g);
+            }
+        };
+        btn.setFont(new Font("Dialog", Font.PLAIN, 13));
+        btn.setForeground(textColor);
+        btn.setOpaque(false); btn.setContentAreaFilled(false);
+        btn.setBorderPainted(false); btn.setFocusPainted(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.setPreferredSize(new Dimension(110, 38));
+        return btn;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    //  ACTIONS
+    // ─────────────────────────────────────────────────────────────
+    public void addRecords() {
+        String title = txtTitle.getText().trim();
+        String type  = txtType.getText().trim();
+        String genre = txtGenre.getText().trim();
+        String dewey = txtDewey.getText().trim();
+
+        if (title.isEmpty() || type.isEmpty() || genre.isEmpty() || dewey.isEmpty()) {
+            lblStatus.setForeground(warnColor);
+            lblStatus.setText("Please fill in all fields.");
+            JOptionPane.showMessageDialog(this, "Please complete all fields.", "Warning", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        db database = new db();
+        Book newBook = new Book(title, type, genre, dewey,
+                                "N/A", "N/A", 0, LocalDate.now());
+        boolean success = database.addBook(newBook);
+        if (success) {
+            lblStatus.setForeground(successColor);
+            lblStatus.setText("Added: \"" + title + "\" successfully.");
+            clearFields();
+        } else {
+            lblStatus.setForeground(errColor);
+            lblStatus.setText("Database error. Check console.");
+        }
+        database.closeConnection();
+    }
+
+    public void displayDashboard() {
+        lblStatus.setForeground(gold);
+        lblStatus.setText("Dashboard coming soon.");
+        JOptionPane.showMessageDialog(this, "Dashboard is under construction.", "Dashboard", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public void clearFields() {
+        txtTitle.setText(""); txtType.setText("");
+        txtGenre.setText(""); txtDewey.setText("");
+        lblStatus.setForeground(grayText);
+        lblStatus.setText("Fields cleared.");
+    }
+
+    public void showAbout() {
+        // Build a custom dialog with both logos
+>>>>>>> 02fd976b27e71526cd848b78bacca822263fcd54
         JDialog dlg = new JDialog(this, "About", true);
         dlg.setSize(380, 280);
         dlg.setLocationRelativeTo(this);
