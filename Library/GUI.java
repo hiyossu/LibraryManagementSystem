@@ -12,14 +12,14 @@ import javax.swing.table.*;
 
 public class GUI extends JFrame {
 
-    private Color bgColor = new Color(13, 10, 10);
-    private Color sidebarColor = new Color(18, 5, 5);
-    private Color panelColor = new Color(30, 8, 8);
-    private Color cardColor = new Color(34, 12, 12);
+    private Color bgColor = new Color(255, 255, 255);
+    private Color sidebarColor = new Color(255, 255, 255);
+    private Color panelColor = new Color(255, 255, 255);
+    private Color cardColor = new Color(255, 255, 255);
     private Color gold = new Color(212, 160, 23);
     private Color darkGold = new Color(154, 114, 10);
     private Color red = new Color(190, 16, 16);
-    private Color textColor = new Color(245, 236, 220);
+    private Color textColor = new Color(0, 0, 0);
     private Color grayText = new Color(136, 120, 104);
     private Color divColor = new Color(58, 20, 20);
     private Color successColor = new Color(107, 181, 114);
