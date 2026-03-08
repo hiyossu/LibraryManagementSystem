@@ -8,6 +8,14 @@ public class DataValidation {
 
     private List<String> errorList;
     private List<String> validationRules;
+    private String currentTitle;
+    private String currentIsbn;
+    private String currentAuthor;
+    private String currentDeweyDecimal;
+    private int currentPages;
+    private String currentType;
+    private String currentGenre;
+    private LocalDate currentYearPublished;
 
     // Constructor
     public DataValidation() {
@@ -48,51 +56,19 @@ public class DataValidation {
 
     // checkConstraints
     public boolean checkConstraints(String isbn, String title, String author,
-                                    String ddsCode, int pages, LocalDate yearPublished) {
+                                    String ddsCode, int pages, LocalDate yearPublished, String type, String genre) {
         clearErrors();
-
-        // ISBN 
-        if (isbn == null || isbn.trim().isEmpty()) {
-            errorList.add("ISBN is required.");
-        } else {
-            String isbnDigits = isbn.replaceAll("-", "").trim();
-            if (!isbnDigits.matches("\\d{10}|\\d{13}")) {
-                errorList.add("ISBN must be exactly 10 or 13 digits.");
-            }
-        }
-
-        // Title, max 200 chars
-        if (title == null || title.trim().isEmpty()) {
-            errorList.add("Title is required.");
-        } else if (title.trim().length() > 200) {
-            errorList.add("Title exceeds 200 characters.");
-        }
-
-        // Author, max 200 chars
-        if (author == null || author.trim().isEmpty()) {
-            errorList.add("Author is required.");
-        } else if (author.trim().length() > 200) {
-            errorList.add("Author exceeds 200 characters.");
-        }
-
-        // DDS Code
-        if (ddsCode == null || ddsCode.trim().isEmpty()) {
-            errorList.add("DDS Code is required.");
-        } else if (!ddsCode.trim().matches("\\d{3}(\\.\\d+)?")) {
-            errorList.add("DDS Code must follow Dewey Decimal format (e.g. 005, 005.13).");
-        }
-
-        // Pages must be positive
-        if (pages <= 0) {
-            errorList.add("Pages must be a positive number greater than 0.");
-        }
-
-        // Year Published 
-        if (yearPublished == null) {
-            errorList.add("Year Published is required.");
-        } else if (!isYearPublishedValid(yearPublished)) {
-            errorList.add("Year Published cannot be a future date.");
-        }
+        if (isbn == null || !isbn.replaceAll("-", "").trim().matches("\\d{10}|\\d{13}")) 
+            errorList.add("ISBN must be 10 or 13 digits.");
+        if (title == null || title.trim().isEmpty()) errorList.add("Title is required.");
+        if (author == null || author.trim().isEmpty()) errorList.add("Author is required.");
+        if (ddsCode == null || !ddsCode.trim().matches("\\d{3}(\\.\\d+)?")) 
+            errorList.add("DDS Code format error.");
+        if (pages <= 0) errorList.add("Pages must be > 0.");
+        if (yearPublished == null || yearPublished.isAfter(LocalDate.now())) 
+            errorList.add("Invalid publication date.");
+        if (type == null || type.trim().isEmpty()) errorList.add("Media Type is required.");
+        if (genre == null || genre.trim().isEmpty()) errorList.add("Genre is required.");
 
         return errorList.isEmpty();
     }
@@ -109,6 +85,22 @@ public class DataValidation {
         return true;
     }
 
+    public void setInputFields(String title, String type, String genre, String deweyDecimal, String isbn, String author, int pages, LocalDate yearPublished){
+        this.currentIsbn = isbn;
+        this.currentTitle = title;
+        this.currentAuthor = author;
+        this.currentDeweyDecimal = deweyDecimal;
+        this.currentPages = pages;
+        this.currentYearPublished = yearPublished;
+        this.currentType = type;
+        this.currentGenre = genre;
+    }
+
+    public boolean validateCurrentFields(){
+        clearErrors();
+        return checkConstraints(currentIsbn, currentTitle, currentAuthor, currentDeweyDecimal, currentPages, currentYearPublished, currentType, currentGenre);
+    }
+
     // clearErrors
     public void clearErrors() {
         errorList.clear();
@@ -119,6 +111,10 @@ public class DataValidation {
         return errorList;
     }
 
+    public String getFirstError(){
+        return errorList.isEmpty() ? null : errorList.get(0);
+    }
+    
     public List<String> getValidationRules() {
         return validationRules;
     }

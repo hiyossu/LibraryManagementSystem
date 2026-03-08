@@ -7,6 +7,7 @@ import java.io.InputStream;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.*;
+import java.time.LocalDate;
 
 public class GUI extends JFrame {
     // colors
@@ -554,7 +555,8 @@ public class GUI extends JFrame {
         }
 
         db database = new db();
-        Book newBook = new Book(title, type, genre, dewey);
+        Book newBook = new Book(title, type, genre, dewey,
+                                "N/A", "N/A", 0, LocalDate.now());
         boolean success = database.addBook(newBook);
         if (success) {
             lblStatus.setForeground(successColor);

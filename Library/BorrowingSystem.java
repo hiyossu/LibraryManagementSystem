@@ -30,9 +30,9 @@ public class BorrowingSystem {
         }
     }
 
-    public void checkout(String isbn, String title, String author, String ddsCode, int pages, LocalDate yearPublished){
+    public void checkout(String isbn, String title, String author, String ddsCode, int pages, LocalDate yearPublished, String type, String genre){
         exceptionHandlers.clear();
-        boolean isValid = validator.checkConstraints(isbn, title, author, ddsCode, pages, yearPublished);
+        boolean isValid = validator.checkConstraints(isbn, title, author, ddsCode, pages, yearPublished, type, genre);
         if(!isValid){
             for(String errorMsg : validator.getErrors()){
                 exceptionHandlers.add(new ExceptionHandler(1000, errorMsg));
@@ -67,7 +67,7 @@ public class BorrowingSystem {
 
         BorrowingSystem session = new BorrowingSystem(lastWeek, today, yesterday, "Good");
         
-        session.checkout("1234567890", "Java Logic", "Author Name", "005.1", 250, LocalDate.of(2025, 1, 1));
+        session.checkout("1234567890", "Java Logic", "Author Name", "005.1", 250, LocalDate.of(2025, 1, 1), "Book", "Programming");
         System.out.println("---");
         session.returnItem();
     }
