@@ -30,7 +30,7 @@ public class GUI extends JFrame {
     private Color tableBg = new Color(22, 7, 7);
     private Color tableAlt = new Color(28, 9, 9);
     private Color tableHeader = new Color(50, 15, 15);
-    
+
     private JTextField txtTitle, txtGenre, txtDewey;
     private JTextField txtCheckoutBookId, txtCheckoutBorrowerId, txtCheckoutCondition;
     private JTextField txtReturnLoanId;
@@ -62,6 +62,7 @@ public class GUI extends JFrame {
         loadLogos();
         setTitle("Mapua Cardinal Library - Makati");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        // ── BIGGER default window ──
         setSize(1280, 800);
         setMinimumSize(new Dimension(1024, 660));
         setLocationRelativeTo(null);
@@ -71,7 +72,7 @@ public class GUI extends JFrame {
     }
 
     // ─────────────────────────────────────────────────────────────
-    //  LOGIN SCREEN
+    //  LOGIN SCREEN  (fully centered layout)
     // ─────────────────────────────────────────────────────────────
     private void showLoginScreen() {
         JPanel loginRoot = new JPanel(new GridBagLayout());
@@ -83,6 +84,7 @@ public class GUI extends JFrame {
         gbc.weighty = 1.0;
         gbc.anchor = GridBagConstraints.CENTER;
 
+        // Outer card — fixed width, everything stacks vertically
         JPanel card = new JPanel();
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.setBackground(cardColor);
@@ -92,6 +94,7 @@ public class GUI extends JFrame {
         card.setMaximumSize(new Dimension(520, 9999));
         card.setPreferredSize(new Dimension(520, 570));
 
+        // ── Gold/red accent strip (full width) ──
         JPanel strip = new JPanel(new GridLayout(1, 2));
         strip.setMaximumSize(new Dimension(9999, 4));
         strip.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -101,6 +104,7 @@ public class GUI extends JFrame {
         card.add(strip);
         card.add(Box.createVerticalStrut(30));
 
+        // ── Logo centered ──
         if (iconEmblem != null) {
             ImageIcon smallLogo = scaleIcon(toBufferedImage(iconEmblem), 90, 70);
             JLabel logo = new JLabel(smallLogo);
@@ -109,6 +113,7 @@ public class GUI extends JFrame {
             card.add(Box.createVerticalStrut(14));
         }
 
+        // ── Title centered ──
         JLabel title = new JLabel("Cardinal Library");
         title.setFont(new Font("Georgia", Font.BOLD, 30));
         title.setForeground(textColor);
@@ -130,6 +135,7 @@ public class GUI extends JFrame {
         card.add(sep);
         card.add(Box.createVerticalStrut(26));
 
+        // ── Form fields — all use CENTER_ALIGNMENT and fill full card width ──
         JLabel roleLabel = new JLabel("SELECT YOUR ROLE");
         roleLabel.setFont(new Font("Dialog", Font.BOLD, 11));
         roleLabel.setForeground(grayText);
@@ -145,7 +151,7 @@ public class GUI extends JFrame {
         card.add(cmbRole);
         card.add(Box.createVerticalStrut(18));
 
-        // Student ID row
+        // Student ID
         JLabel idLabel = new JLabel("STUDENT ID");
         idLabel.setFont(new Font("Dialog", Font.BOLD, 11));
         idLabel.setForeground(grayText);
@@ -155,7 +161,7 @@ public class GUI extends JFrame {
         txtLoginId.setMaximumSize(new Dimension(9999, 42));
         txtLoginId.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // Admin password row
+        // Admin password
         JLabel passLabel = new JLabel("ADMIN PASSWORD");
         passLabel.setFont(new Font("Dialog", Font.BOLD, 11));
         passLabel.setForeground(grayText);
@@ -177,6 +183,7 @@ public class GUI extends JFrame {
         card.add(txtPass);
         card.add(Box.createVerticalStrut(18));
 
+        // Error label
         final JLabel errLabel = new JLabel(" ");
         errLabel.setFont(new Font("Dialog", Font.PLAIN, 12));
         errLabel.setForeground(errColor);
@@ -184,19 +191,19 @@ public class GUI extends JFrame {
         card.add(errLabel);
         card.add(Box.createVerticalStrut(10));
 
+        // Enter button — full width, tall
         JButton btnLogin = makePrimaryButton("Enter Library");
         btnLogin.setMaximumSize(new Dimension(9999, 48));
         btnLogin.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnLogin.setFont(new Font("Dialog", Font.BOLD, 15));
         card.add(btnLogin);
 
-        // ── FIX: Role switching — Guest hides both ID and password fields ──
+        // Role switching logic
         cmbRole.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String role = cmbRole.getSelectedItem().toString();
                 boolean isStudent = role.equals("Student");
                 boolean isAdmin   = role.equals("Admin");
-
                 idLabel.setVisible(isStudent);
                 txtLoginId.setVisible(isStudent);
                 passLabel.setVisible(isAdmin);
@@ -227,7 +234,6 @@ public class GUI extends JFrame {
                     if (!pass.equals(ADMIN_PASSWORD)) { errLabel.setText("Incorrect password."); return; }
                     currentRole = "Admin";
                 } else {
-                    // Guest — no validation needed
                     currentRole = "Guest";
                 }
                 buildMainUI();
@@ -250,16 +256,13 @@ public class GUI extends JFrame {
         root.add(buildSidebar(), BorderLayout.WEST);
         root.add(buildMainPanel(), BorderLayout.CENTER);
         revalidate(); repaint();
-
-        // ── FIX: All roles see Borrow/Search first; Admin also gets dashboard ──
-        if (currentRole.equals("Admin")) {
+        if (currentRole.equals("Student")) {
+            showCard("MY_LOANS");
+            updateTopBar("My Loans", "My Account");
+        } else {
             showCard("DASHBOARD");
             updateTopBar("Dashboard", "System / Dashboard");
             refreshDashboard();
-        } else {
-            // Student and Guest both land on Checkout first
-            showCard("CHECKOUT");
-            updateTopBar("Checkout Book", "Borrowing / Checkout");
         }
     }
 
@@ -311,11 +314,11 @@ public class GUI extends JFrame {
     }
 
     // ─────────────────────────────────────────────────────────────
-    //  SIDEBAR — FIX: BORROWING section is now always at the top
+    //  SIDEBAR  (slightly wider)
     // ─────────────────────────────────────────────────────────────
     private JPanel buildSidebar() {
         JPanel sidebar = new JPanel();
-        sidebar.setPreferredSize(new Dimension(255, 0));
+        sidebar.setPreferredSize(new Dimension(255, 0));   // wider sidebar
         sidebar.setBackground(sidebarColor);
         sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
         sidebar.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, divColor));
@@ -324,22 +327,12 @@ public class GUI extends JFrame {
 
         boolean isAdmin   = "Admin".equals(currentRole);
         boolean isStudent = "Student".equals(currentRole);
-        boolean isGuest   = "Guest".equals(currentRole);
 
-        // ── BORROWING first for Student and Guest ──
-        if (isStudent || isGuest) {
-            sidebar.add(makeDividerLabel("BORROWING"));
-            sidebar.add(makeNavBtn("  Checkout Book", "checkout"));
-            sidebar.add(makeNavBtn("  Return Book",   "returnbook"));
-        }
-
-        // ── CATALOG ──
         sidebar.add(makeDividerLabel("CATALOG"));
         if (isAdmin) sidebar.add(makeNavBtn("  + Add New Book", "add"));
         sidebar.add(makeNavBtn("  Search Books", "search"));
 
-        // ── Admin borrowing ──
-        if (isAdmin) {
+        if (isAdmin || isStudent) {
             sidebar.add(makeDividerLabel("BORROWING"));
             sidebar.add(makeNavBtn("  Checkout Book", "checkout"));
             sidebar.add(makeNavBtn("  Return Book",   "returnbook"));
@@ -430,10 +423,7 @@ public class GUI extends JFrame {
         footer.setBackground(sidebarColor);
         footer.setBorder(new EmptyBorder(12, 22, 18, 22));
         footer.setMaximumSize(new Dimension(255, 62));
-        String sessionLabel = "Admin".equals(currentRole) ? "ADMIN SESSION"
-                            : "Student".equals(currentRole) ? "STUDENT SESSION"
-                            : "GUEST SESSION";
-        JLabel a = new JLabel(sessionLabel);
+        JLabel a = new JLabel("ADMIN SESSION");
         a.setFont(new Font("Monospaced", Font.BOLD, 10)); a.setForeground(gold);
         JLabel v = new JLabel("LMS v2.0  2025");
         v.setFont(new Font("Dialog", Font.PLAIN, 10)); v.setForeground(grayText);
@@ -453,6 +443,7 @@ public class GUI extends JFrame {
         return p;
     }
 
+    // ── Nav button is taller for easier clicking ──
     private JPanel makeNavBtn(final String text, final String action) {
         final JPanel btn = new JPanel(new BorderLayout());
         btn.setBackground(sidebarColor);
@@ -467,6 +458,7 @@ public class GUI extends JFrame {
             public void mouseExited (MouseEvent e) { if (btn != activeNavBtn) btn.setBackground(sidebarColor); }
             public void mouseClicked(MouseEvent e) { navigateTo(action, btn); }
         });
+        if (action.equals("add")) setActiveNav(btn, lbl);
         return btn;
     }
 
@@ -501,7 +493,6 @@ public class GUI extends JFrame {
         } else if (action.equals("returnbook")) {
             showCard("RETURN");
             updateTopBar("Return Book", "Borrowing / Return");
-            refreshActiveLoansReturnTable();
         } else if (action.equals("add_boardgame")) {
             showCard("ADD_BOARDGAME");
             updateTopBar("Board Game", "Media / Board Game");
@@ -548,22 +539,25 @@ public class GUI extends JFrame {
 
     private JLabel lblPageTitle, lblCrumb;
 
+    // ─────────────────────────────────────────────────────────────
+    //  MAIN PANEL  (taller top bar)
+    // ─────────────────────────────────────────────────────────────
     private JPanel buildMainPanel() {
         JPanel main = new JPanel(new BorderLayout());
         main.setBackground(bgColor);
 
         JPanel topBar = new JPanel(new BorderLayout());
         topBar.setBackground(panelColor);
-        topBar.setPreferredSize(new Dimension(0, 62));
+        topBar.setPreferredSize(new Dimension(0, 62));   // taller top bar
         topBar.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createMatteBorder(0, 0, 2, 0, red),
             new EmptyBorder(0, 28, 0, 28)));
 
-        lblPageTitle = new JLabel("Checkout Book");
-        lblPageTitle.setFont(new Font("Georgia", Font.BOLD, 20));
+        lblPageTitle = new JLabel("Add New Book Record");
+        lblPageTitle.setFont(new Font("Georgia", Font.BOLD, 20));   // bigger
         lblPageTitle.setForeground(textColor);
 
-        lblCrumb = new JLabel("Borrowing / Checkout");
+        lblCrumb = new JLabel("Library Catalog / Add Record");
         lblCrumb.setFont(new Font("Dialog", Font.PLAIN, 12));
         lblCrumb.setForeground(grayText);
 
@@ -589,6 +583,7 @@ public class GUI extends JFrame {
         mainContent.add(buildMyLoansPanel(),                          "MY_LOANS");
         main.add(mainContent, BorderLayout.CENTER);
 
+        // ── Status bar ──
         JPanel statusBar = new JPanel(new BorderLayout());
         statusBar.setBackground(sidebarColor);
         statusBar.setPreferredSize(new Dimension(0, 34));
@@ -855,6 +850,7 @@ public class GUI extends JFrame {
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         outer.add(makeScrollPane(table), BorderLayout.CENTER);
 
+        // Bottom form
         JPanel bottom = new JPanel(new BorderLayout());
         bottom.setBackground(panelColor);
         bottom.setBorder(BorderFactory.createCompoundBorder(
@@ -1082,10 +1078,10 @@ public class GUI extends JFrame {
         JPanel card = new JPanel(new BorderLayout());
         card.setBackground(cardColor);
         card.setBorder(BorderFactory.createLineBorder(divColor, 1));
-        card.setPreferredSize(new Dimension(760, 420));
+        card.setPreferredSize(new Dimension(760, 420));   // wider card
 
         JPanel accent = new JPanel(new GridLayout(1, 2));
-        accent.setPreferredSize(new Dimension(0, 5));
+        accent.setPreferredSize(new Dimension(0, 5));    // slightly thicker accent
         JPanel a1 = new JPanel(); a1.setBackground(gold);
         JPanel a2 = new JPanel(); a2.setBackground(red);
         accent.add(a1); accent.add(a2);
@@ -1173,7 +1169,7 @@ public class GUI extends JFrame {
         activeTitle.setFont(new Font("Dialog", Font.BOLD, 13));
         activeTitle.setForeground(gold);
         activeTitle.setBorder(new EmptyBorder(12, 14, 12, 14));
-        String[] activeCols = {"Loan ID", "Title", "Date Borrowed", "Due Date", "Status"};
+        String[] activeCols = {"Loan ID", "Title", "Type", "Date Borrowed", "Due Date"};
         myLoansModel = new DefaultTableModel(activeCols, 0) {
             public boolean isCellEditable(int r, int c) { return false; }
         };
@@ -1209,47 +1205,25 @@ public class GUI extends JFrame {
         if (currentStudentId < 0) return;
         try {
             db database = new db();
-            java.util.Date today = new java.util.Date();
-            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
-
-            // ── Active loans — getActiveLoansByBorrower returns Title directly ──
             List<String> loans = database.getActiveLoansByBorrower(currentStudentId);
             for (String l : loans) {
-                String loanId = "", title = "", borrowed = "", due = "";
-                for (String s : l.split(" \\| ")) {
-                    if      (s.startsWith("LoanID: "))   loanId   = s.replace("LoanID: ", "").trim();
-                    else if (s.startsWith("Title: "))    title    = s.replace("Title: ", "").trim();
+                String[] p = l.split(" \\| ");
+                String loanId = "", bookId = "", borrowed = "", due = "";
+                for (String s : p) {
+                    if (s.startsWith("LoanID: "))     loanId  = s.replace("LoanID: ", "").trim();
+                    else if (s.startsWith("BookID: ")) bookId  = s.replace("BookID: ", "").trim();
                     else if (s.startsWith("Borrowed: ")) borrowed = s.replace("Borrowed: ", "").trim();
-                    else if (s.startsWith("Due: "))      due      = s.replace("Due: ", "").trim();
+                    else if (s.startsWith("Due: "))    due     = s.replace("Due: ", "").trim();
                 }
-                String status = "Active";
-                try {
-                    java.util.Date dueDate   = sdf.parse(due);
-                    java.util.Date todayOnly = sdf.parse(sdf.format(today));
-                    long days = (todayOnly.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24);
-                    if (days > 0)       status = "OVERDUE (" + days + "d — PHP " + (days * 5) + ")";
-                    else if (days == 0) status = "Due Today";
-                } catch (Exception ignored) {}
-                myLoansModel.addRow(new Object[]{loanId, title, borrowed, due, status});
-            }
-
-            // ── Borrow history — all returned loans for this student ──
-            List<String> allLoans = database.getAllActiveLoans(); // reuse same join query base
-            // Actually we need a history query — use a direct SQL approach via a new method
-            List<String> history = database.getBorrowHistoryForBorrower(currentStudentId);
-            for (String h : history) {
-                String loanId = "", title = "", borrowed = "", returned = "";
-                for (String s : h.split(" \\| ")) {
-                    if      (s.startsWith("LoanID: "))    loanId   = s.replace("LoanID: ", "").trim();
-                    else if (s.startsWith("Title: "))     title    = s.replace("Title: ", "").trim();
-                    else if (s.startsWith("Borrowed: "))  borrowed = s.replace("Borrowed: ", "").trim();
-                    else if (s.startsWith("Returned: "))  returned = s.replace("Returned: ", "").trim();
+                String title = "", type = "";
+                if (!bookId.isEmpty()) {
+                    try {
+                        String status = database.getBookStatus(Integer.parseInt(bookId));
+                        String[] sp = status.split(" — ");
+                        if (sp.length > 0) title = sp[0];
+                    } catch (Exception ignored) {}
                 }
-                // Calculate fine on the returned loan
-                double fine = 0;
-                try { fine = database.calculateOverdueFine(Integer.parseInt(loanId)); } catch (Exception ignored) {}
-                String fineStr = fine > 0 ? "PHP " + String.format("%.2f", fine) : "None";
-                myHistoryModel.addRow(new Object[]{loanId, title, borrowed, returned, fineStr});
+                myLoansModel.addRow(new Object[]{loanId, title, type, borrowed, due});
             }
             database.closeConnection();
         } catch (Exception ex) {
@@ -1359,191 +1333,69 @@ public class GUI extends JFrame {
     }
 
     // ─────────────────────────────────────────────────────────────
-    //  CHECKOUT PANEL
+    //  CHECKOUT PANEL  (wider card)
     // ─────────────────────────────────────────────────────────────
-    private JLabel lblCheckoutBookInfo, lblCheckoutBorrowerInfo;
-
     private JPanel buildCheckoutPanel() {
-        JPanel outer = new JPanel(new BorderLayout());
-        outer.setBackground(bgColor);
-        outer.setBorder(new EmptyBorder(24, 32, 24, 32));
+        JPanel wrap = new JPanel(new GridBagLayout());
+        wrap.setBackground(bgColor);
 
-        // ── Page heading ──────────────────────────────────────────
-        JLabel heading = new JLabel("Checkout Book");
-        heading.setFont(new Font("Georgia", Font.BOLD, 20));
-        heading.setForeground(textColor);
-        heading.setBorder(new EmptyBorder(0, 0, 18, 0));
-        outer.add(heading, BorderLayout.NORTH);
+        JPanel card = new JPanel(new BorderLayout());
+        card.setBackground(cardColor);
+        card.setBorder(BorderFactory.createLineBorder(divColor, 1));
+        card.setPreferredSize(new Dimension(520, 340));   // wider
 
-        // ── Two-column layout: form left, preview right ───────────
-        JPanel cols = new JPanel(new GridLayout(1, 2, 20, 0));
-        cols.setBackground(bgColor);
+        JPanel strip = new JPanel(new GridLayout(1, 2));
+        strip.setPreferredSize(new Dimension(0, 4));
+        JPanel s1 = new JPanel(); s1.setBackground(gold);
+        JPanel s2 = new JPanel(); s2.setBackground(red);
+        strip.add(s1); strip.add(s2);
+        card.add(strip, BorderLayout.NORTH);
 
-        // ── LEFT: input form ──────────────────────────────────────
-        JPanel formCard = new JPanel(new BorderLayout());
-        formCard.setBackground(cardColor);
-        formCard.setBorder(BorderFactory.createLineBorder(divColor, 1));
+        JPanel body = new JPanel();
+        body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
+        body.setBackground(cardColor);
+        body.setBorder(new EmptyBorder(24, 32, 28, 32));
 
-        JPanel formAccent = new JPanel(new GridLayout(1, 2));
-        formAccent.setPreferredSize(new Dimension(0, 4));
-        JPanel fa1 = new JPanel(); fa1.setBackground(gold);
-        JPanel fa2 = new JPanel(); fa2.setBackground(red);
-        formAccent.add(fa1); formAccent.add(fa2);
-        formCard.add(formAccent, BorderLayout.NORTH);
+        JLabel title = new JLabel("Checkout Book");
+        title.setFont(new Font("Georgia", Font.BOLD, 22));
+        title.setForeground(textColor);
+        JLabel sub = new JLabel("Loan a book to a registered borrower. Due date is set to 14 days.");
+        sub.setFont(new Font("Dialog", Font.PLAIN, 12));
+        sub.setForeground(grayText);
 
-        JPanel formBody = new JPanel();
-        formBody.setLayout(new BoxLayout(formBody, BoxLayout.Y_AXIS));
-        formBody.setBackground(cardColor);
-        formBody.setBorder(new EmptyBorder(24, 28, 28, 28));
-
-        JLabel formTitle = new JLabel("New Loan");
-        formTitle.setFont(new Font("Georgia", Font.BOLD, 18)); formTitle.setForeground(textColor);
-        JLabel formSub = new JLabel("Due date will be set to 14 days from today.");
-        formSub.setFont(new Font("Dialog", Font.PLAIN, 12)); formSub.setForeground(grayText);
-        formBody.add(formTitle); formBody.add(Box.createVerticalStrut(4)); formBody.add(formSub);
-        formBody.add(Box.createVerticalStrut(20));
-        formBody.add(makeSeparatorLine()); formBody.add(Box.createVerticalStrut(20));
+        body.add(title);
+        body.add(Box.createVerticalStrut(5));
+        body.add(sub);
+        body.add(Box.createVerticalStrut(18));
+        body.add(new JSeparator() {{ setForeground(divColor); setMaximumSize(new Dimension(9999, 1)); }});
+        body.add(Box.createVerticalStrut(18));
 
         txtCheckoutBookId     = makeField("Enter Book ID");
         txtCheckoutBorrowerId = makeField("Enter Borrower ID No.");
-        txtCheckoutCondition  = makeField("Good");
+        txtCheckoutCondition  = makeField("e.g., Good, Fair, Poor");
 
-        // Live lookup on focus lost
-        txtCheckoutBookId.addFocusListener(new FocusAdapter() {
-            public void focusLost(FocusEvent e) { updateCheckoutPreview(); }
-        });
-        txtCheckoutBorrowerId.addFocusListener(new FocusAdapter() {
-            public void focusLost(FocusEvent e) { updateCheckoutPreview(); }
-        });
-
-        formBody.add(makeFormLabel("Book ID"));      formBody.add(Box.createVerticalStrut(6));
-        txtCheckoutBookId.setMaximumSize(new Dimension(9999, 42)); txtCheckoutBookId.setAlignmentX(Component.LEFT_ALIGNMENT);
-        formBody.add(txtCheckoutBookId);             formBody.add(Box.createVerticalStrut(16));
-
-        formBody.add(makeFormLabel("Borrower ID"));  formBody.add(Box.createVerticalStrut(6));
-        txtCheckoutBorrowerId.setMaximumSize(new Dimension(9999, 42)); txtCheckoutBorrowerId.setAlignmentX(Component.LEFT_ALIGNMENT);
-        formBody.add(txtCheckoutBorrowerId);         formBody.add(Box.createVerticalStrut(16));
-
-        formBody.add(makeFormLabel("Book Condition")); formBody.add(Box.createVerticalStrut(6));
-        txtCheckoutCondition.setMaximumSize(new Dimension(9999, 42)); txtCheckoutCondition.setAlignmentX(Component.LEFT_ALIGNMENT);
-        formBody.add(txtCheckoutCondition);          formBody.add(Box.createVerticalStrut(28));
-
-        formBody.add(makeSeparatorLine());           formBody.add(Box.createVerticalStrut(20));
+        body.add(makeInlineRow("Book ID",        txtCheckoutBookId));     body.add(Box.createVerticalStrut(12));
+        body.add(makeInlineRow("Borrower ID",    txtCheckoutBorrowerId)); body.add(Box.createVerticalStrut(12));
+        body.add(makeInlineRow("Book Condition", txtCheckoutCondition));  body.add(Box.createVerticalStrut(24));
 
         JPanel btns = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 0));
-        btns.setBackground(cardColor); btns.setAlignmentX(Component.LEFT_ALIGNMENT);
+        btns.setBackground(cardColor);
         btns.setMaximumSize(new Dimension(9999, 48));
-        JButton btnCheckout = makePrimaryButton("✔  Confirm Checkout");
+        btns.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JButton btnCheckout = makePrimaryButton("Checkout");
         JButton btnClear    = makeOutlineButton("Clear");
-        btnCheckout.setPreferredSize(new Dimension(180, 44));
-        btnClear.setPreferredSize(new Dimension(100, 44));
+        btnCheckout.setPreferredSize(new Dimension(140, 44));
+        btnClear.setPreferredSize(new Dimension(110, 44));
         btnCheckout.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) { doCheckout(); } });
         btnClear.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) {
-            txtCheckoutBookId.setText(""); txtCheckoutBorrowerId.setText("");
-            txtCheckoutCondition.setText("Good"); clearCheckoutPreview();
+            txtCheckoutBookId.setText(""); txtCheckoutBorrowerId.setText(""); txtCheckoutCondition.setText("");
         }});
         btns.add(btnCheckout); btns.add(btnClear);
-        formBody.add(btns);
-        formCard.add(formBody, BorderLayout.CENTER);
+        body.add(btns);
 
-        // ── RIGHT: live preview card ───────────────────────────────
-        JPanel previewCard = new JPanel(new BorderLayout());
-        previewCard.setBackground(cardColor);
-        previewCard.setBorder(BorderFactory.createLineBorder(divColor, 1));
-
-        JPanel previewHeader = new JPanel(new BorderLayout());
-        previewHeader.setBackground(new Color(40, 14, 14));
-        previewHeader.setBorder(new EmptyBorder(14, 20, 14, 20));
-        JLabel previewTitle = new JLabel("Loan Preview");
-        previewTitle.setFont(new Font("Georgia", Font.BOLD, 15)); previewTitle.setForeground(gold);
-        JLabel previewHint = new JLabel("Tab out of fields to preview");
-        previewHint.setFont(new Font("Dialog", Font.ITALIC, 11)); previewHint.setForeground(grayText);
-        previewHeader.add(previewTitle, BorderLayout.NORTH);
-        previewHeader.add(previewHint, BorderLayout.SOUTH);
-        previewCard.add(previewHeader, BorderLayout.NORTH);
-
-        JPanel previewBody = new JPanel();
-        previewBody.setLayout(new BoxLayout(previewBody, BoxLayout.Y_AXIS));
-        previewBody.setBackground(cardColor);
-        previewBody.setBorder(new EmptyBorder(22, 24, 22, 24));
-
-        // Book info block
-        JLabel bookLabel = new JLabel("BOOK");
-        bookLabel.setFont(new Font("Dialog", Font.BOLD, 10)); bookLabel.setForeground(grayText);
-        lblCheckoutBookInfo = new JLabel("<html><i>Enter a Book ID to preview</i></html>");
-        lblCheckoutBookInfo.setFont(new Font("Dialog", Font.PLAIN, 13)); lblCheckoutBookInfo.setForeground(textColor);
-        lblCheckoutBookInfo.setBorder(new EmptyBorder(6, 0, 0, 0));
-
-        // Borrower info block
-        JLabel borrLabel = new JLabel("BORROWER");
-        borrLabel.setFont(new Font("Dialog", Font.BOLD, 10)); borrLabel.setForeground(grayText);
-        borrLabel.setBorder(new EmptyBorder(18, 0, 0, 0));
-        lblCheckoutBorrowerInfo = new JLabel("<html><i>Enter a Borrower ID to preview</i></html>");
-        lblCheckoutBorrowerInfo.setFont(new Font("Dialog", Font.PLAIN, 13)); lblCheckoutBorrowerInfo.setForeground(textColor);
-        lblCheckoutBorrowerInfo.setBorder(new EmptyBorder(6, 0, 0, 0));
-
-        // Due date info
-        JLabel dueLabel = new JLabel("DUE DATE");
-        dueLabel.setFont(new Font("Dialog", Font.BOLD, 10)); dueLabel.setForeground(grayText);
-        dueLabel.setBorder(new EmptyBorder(18, 0, 0, 0));
-        java.time.LocalDate dueDate = java.time.LocalDate.now().plusDays(14);
-        JLabel dueDateVal = new JLabel(dueDate.toString());
-        dueDateVal.setFont(new Font("Georgia", Font.BOLD, 16)); dueDateVal.setForeground(gold);
-        dueDateVal.setBorder(new EmptyBorder(6, 0, 0, 0));
-
-        for (Component c : new Component[]{bookLabel, lblCheckoutBookInfo, borrLabel,
-                                            lblCheckoutBorrowerInfo, dueLabel, dueDateVal}) {
-            ((JLabel)c).setAlignmentX(Component.LEFT_ALIGNMENT);
-            previewBody.add((JLabel)c);
-        }
-        previewCard.add(previewBody, BorderLayout.CENTER);
-
-        cols.add(formCard);
-        cols.add(previewCard);
-        outer.add(cols, BorderLayout.CENTER);
-        return outer;
-    }
-
-    private void updateCheckoutPreview() {
-        String bookIdStr  = txtCheckoutBookId.getText().trim();
-        String borrIdStr  = txtCheckoutBorrowerId.getText().trim();
-        try {
-            db database = new db();
-            if (!bookIdStr.isEmpty()) {
-                try {
-                    int bookId = Integer.parseInt(bookIdStr);
-                    String status = database.getBookStatus(bookId);
-                    boolean avail = status.contains("Available") && !status.contains("Not Available");
-                    lblCheckoutBookInfo.setText("<html>" + status.replace(" — ", "<br><span style='color:gray'>") + "</span></html>");
-                    lblCheckoutBookInfo.setForeground(avail ? successColor : errColor);
-                } catch (NumberFormatException e) {
-                    lblCheckoutBookInfo.setText("<html><span style='color:#c05050'>Invalid Book ID</span></html>");
-                }
-            }
-            if (!borrIdStr.isEmpty()) {
-                try {
-                    int borrId = Integer.parseInt(borrIdStr);
-                    if (database.borrowerExists(borrId)) {
-                        boolean canBorrow = database.canBorrow(borrId);
-                        java.util.List<String> loans = database.getActiveLoansByBorrower(borrId);
-                        lblCheckoutBorrowerInfo.setText("<html>ID " + borrId + " — " + loans.size() + " active loan(s)<br>"
-                            + (canBorrow ? "<span style='color:green'>Can borrow</span>" : "<span style='color:red'>Borrow limit reached</span>")
-                            + "</html>");
-                        lblCheckoutBorrowerInfo.setForeground(textColor);
-                    } else {
-                        lblCheckoutBorrowerInfo.setText("<html><span style='color:#c05050'>Borrower not found</span></html>");
-                    }
-                } catch (NumberFormatException e) {
-                    lblCheckoutBorrowerInfo.setText("<html><span style='color:#c05050'>Invalid Borrower ID</span></html>");
-                }
-            }
-            database.closeConnection();
-        } catch (Exception ex) { /* silent */ }
-    }
-
-    private void clearCheckoutPreview() {
-        if (lblCheckoutBookInfo != null)    lblCheckoutBookInfo.setText("<html><i>Enter a Book ID to preview</i></html>");
-        if (lblCheckoutBorrowerInfo != null) lblCheckoutBorrowerInfo.setText("<html><i>Enter a Borrower ID to preview</i></html>");
+        card.add(body, BorderLayout.CENTER);
+        wrap.add(card);
+        return wrap;
     }
 
     private void doCheckout() {
@@ -1572,70 +1424,50 @@ public class GUI extends JFrame {
     }
 
     // ─────────────────────────────────────────────────────────────
-    //  RETURN PANEL
+    //  RETURN PANEL  (wider card)
     // ─────────────────────────────────────────────────────────────
-    private DefaultTableModel activeLoansReturnModel;
-
     private JPanel buildReturnPanel() {
-        JPanel outer = new JPanel(new BorderLayout());
-        outer.setBackground(bgColor);
-        outer.setBorder(new EmptyBorder(24, 32, 24, 32));
+        JPanel wrap = new JPanel(new GridBagLayout());
+        wrap.setBackground(bgColor);
 
-        JLabel heading = new JLabel("Return Book");
-        heading.setFont(new Font("Georgia", Font.BOLD, 20));
-        heading.setForeground(textColor);
-        heading.setBorder(new EmptyBorder(0, 0, 18, 0));
-        outer.add(heading, BorderLayout.NORTH);
+        JPanel card = new JPanel(new BorderLayout());
+        card.setBackground(cardColor);
+        card.setBorder(BorderFactory.createLineBorder(divColor, 1));
+        card.setPreferredSize(new Dimension(520, 340));   // wider
 
-        JPanel cols = new JPanel(new GridLayout(1, 2, 20, 0));
-        cols.setBackground(bgColor);
+        JPanel strip = new JPanel(new GridLayout(1, 2));
+        strip.setPreferredSize(new Dimension(0, 4));
+        JPanel s1 = new JPanel(); s1.setBackground(gold);
+        JPanel s2 = new JPanel(); s2.setBackground(red);
+        strip.add(s1); strip.add(s2);
+        card.add(strip, BorderLayout.NORTH);
 
-        // ── LEFT: return form ─────────────────────────────────────
-        JPanel formCard = new JPanel(new BorderLayout());
-        formCard.setBackground(cardColor);
-        formCard.setBorder(BorderFactory.createLineBorder(divColor, 1));
+        JPanel body = new JPanel();
+        body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
+        body.setBackground(cardColor);
+        body.setBorder(new EmptyBorder(24, 32, 28, 32));
 
-        JPanel formAccent = new JPanel(new GridLayout(1, 2));
-        formAccent.setPreferredSize(new Dimension(0, 4));
-        JPanel fa1 = new JPanel(); fa1.setBackground(gold);
-        JPanel fa2 = new JPanel(); fa2.setBackground(red);
-        formAccent.add(fa1); formAccent.add(fa2);
-        formCard.add(formAccent, BorderLayout.NORTH);
+        JLabel title = new JLabel("Return Book");
+        title.setFont(new Font("Georgia", Font.BOLD, 22));
+        title.setForeground(textColor);
+        JLabel sub = new JLabel("Process a book return and calculate any overdue fines.");
+        sub.setFont(new Font("Dialog", Font.PLAIN, 12));
+        sub.setForeground(grayText);
+        body.add(title); body.add(Box.createVerticalStrut(5)); body.add(sub);
+        body.add(Box.createVerticalStrut(18));
+        body.add(new JSeparator() {{ setForeground(divColor); setMaximumSize(new Dimension(9999, 1)); }});
+        body.add(Box.createVerticalStrut(18));
 
-        JPanel formBody = new JPanel();
-        formBody.setLayout(new BoxLayout(formBody, BoxLayout.Y_AXIS));
-        formBody.setBackground(cardColor);
-        formBody.setBorder(new EmptyBorder(24, 28, 28, 28));
-
-        JLabel formTitle = new JLabel("Process Return");
-        formTitle.setFont(new Font("Georgia", Font.BOLD, 18)); formTitle.setForeground(textColor);
-        JLabel formSub = new JLabel("Enter the Loan ID to look up the loan and calculate any fine.");
-        formSub.setFont(new Font("Dialog", Font.PLAIN, 12)); formSub.setForeground(grayText);
-        formBody.add(formTitle); formBody.add(Box.createVerticalStrut(4)); formBody.add(formSub);
-        formBody.add(Box.createVerticalStrut(20));
-        formBody.add(makeSeparatorLine()); formBody.add(Box.createVerticalStrut(20));
-
-        formBody.add(makeFormLabel("Loan ID")); formBody.add(Box.createVerticalStrut(6));
         txtReturnLoanId = makeField("Enter Loan ID");
-        txtReturnLoanId.setMaximumSize(new Dimension(9999, 42));
-        txtReturnLoanId.setAlignmentX(Component.LEFT_ALIGNMENT);
-        formBody.add(txtReturnLoanId); formBody.add(Box.createVerticalStrut(16));
+        body.add(makeInlineRow("Loan ID", txtReturnLoanId));
+        body.add(Box.createVerticalStrut(12));
 
-        // Fine preview area
-        JPanel fineBox = new JPanel(new BorderLayout());
-        fineBox.setBackground(new Color(40, 14, 14));
-        fineBox.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(80, 20, 20), 1),
-            new EmptyBorder(12, 16, 12, 16)));
-        fineBox.setAlignmentX(Component.LEFT_ALIGNMENT);
-        fineBox.setMaximumSize(new Dimension(9999, 80));
-        JLabel fineLabelTop = new JLabel("FINE CALCULATION");
-        fineLabelTop.setFont(new Font("Dialog", Font.BOLD, 10)); fineLabelTop.setForeground(grayText);
-        final JLabel lblFine = new JLabel("—  Enter Loan ID and click Check Fine");
-        lblFine.setFont(new Font("Dialog", Font.PLAIN, 13)); lblFine.setForeground(textColor);
-        fineBox.add(fineLabelTop, BorderLayout.NORTH);
-        fineBox.add(lblFine, BorderLayout.CENTER);
-        formBody.add(fineBox); formBody.add(Box.createVerticalStrut(20));
+        final JLabel lblFine = new JLabel(" ");
+        lblFine.setFont(new Font("Dialog", Font.PLAIN, 12));
+        lblFine.setForeground(warnColor);
+        lblFine.setAlignmentX(Component.LEFT_ALIGNMENT);
+        body.add(lblFine);
+        body.add(Box.createVerticalStrut(12));
 
         JButton btnCheck = makeOutlineButton("Check Fine");
         btnCheck.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -1645,136 +1477,34 @@ public class GUI extends JFrame {
                 String idStr = txtReturnLoanId.getText().trim();
                 if (idStr.isEmpty()) { lblFine.setText("Enter a Loan ID first."); return; }
                 try {
-                    int lid = Integer.parseInt(idStr);
                     db database = new db();
-                    double fine = database.calculateOverdueFine(lid);
-                    String borrowed = database.getDateBorrowed(lid);
-                    String returned = database.getDateReturned(lid);
+                    double fine = database.calculateOverdueFine(Integer.parseInt(idStr));
+                    String borrowed = database.getDateBorrowed(Integer.parseInt(idStr));
                     database.closeConnection();
-                    if (borrowed.equals("N/A")) { lblFine.setText("Loan ID not found."); lblFine.setForeground(errColor); return; }
-                    if (!returned.equals("Not yet returned")) { lblFine.setText("Already returned on " + returned + "."); lblFine.setForeground(warnColor); return; }
-                    if (fine > 0) {
-                        lblFine.setText("PHP " + String.format("%.2f", fine) + " overdue fine  |  Borrowed: " + borrowed);
-                        lblFine.setForeground(errColor);
-                    } else {
-                        lblFine.setText("No fine  |  Borrowed: " + borrowed);
-                        lblFine.setForeground(successColor);
-                    }
-                } catch (NumberFormatException ex) { lblFine.setText("Loan ID must be a number."); lblFine.setForeground(warnColor); }
+                    if (fine > 0) lblFine.setText("Fine: PHP " + String.format("%.2f", fine) + "  |  Borrowed: " + borrowed);
+                    else          lblFine.setText("No fine. Borrowed: " + borrowed);
+                } catch (NumberFormatException ex) { lblFine.setText("Loan ID must be a number."); }
             }
         });
-        formBody.add(btnCheck); formBody.add(Box.createVerticalStrut(24));
-        formBody.add(makeSeparatorLine()); formBody.add(Box.createVerticalStrut(20));
+        body.add(btnCheck);
+        body.add(Box.createVerticalStrut(20));
 
         JPanel btns = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 0));
-        btns.setBackground(cardColor); btns.setAlignmentX(Component.LEFT_ALIGNMENT);
+        btns.setBackground(cardColor);
         btns.setMaximumSize(new Dimension(9999, 48));
-        JButton btnReturn = makePrimaryButton("✔  Process Return");
+        btns.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JButton btnReturn = makePrimaryButton("Process Return");
         JButton btnClear  = makeOutlineButton("Clear");
-        btnReturn.setPreferredSize(new Dimension(170, 44));
-        btnClear.setPreferredSize(new Dimension(100, 44));
-        btnReturn.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) {
-            doReturn(lblFine);
-            refreshActiveLoansReturnTable();
-        }});
-        btnClear.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) {
-            txtReturnLoanId.setText("");
-            lblFine.setText("—  Enter Loan ID and click Check Fine");
-            lblFine.setForeground(textColor);
-        }});
+        btnReturn.setPreferredSize(new Dimension(160, 44));
+        btnClear.setPreferredSize(new Dimension(110, 44));
+        btnReturn.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) { doReturn(lblFine); } });
+        btnClear.addActionListener(new ActionListener()  { public void actionPerformed(ActionEvent e) { txtReturnLoanId.setText(""); lblFine.setText(" "); } });
         btns.add(btnReturn); btns.add(btnClear);
-        formBody.add(btns);
-        formCard.add(formBody, BorderLayout.CENTER);
+        body.add(btns);
 
-        // ── RIGHT: active loans reference table ───────────────────
-        JPanel tableCard = new JPanel(new BorderLayout());
-        tableCard.setBackground(cardColor);
-        tableCard.setBorder(BorderFactory.createLineBorder(divColor, 1));
-
-        JPanel tableHeader = new JPanel(new BorderLayout());
-        tableHeader.setBackground(new Color(40, 14, 14));
-        tableHeader.setBorder(new EmptyBorder(14, 20, 14, 20));
-        JLabel tableTitle = new JLabel("Active Loans Reference");
-        tableTitle.setFont(new Font("Georgia", Font.BOLD, 15)); tableTitle.setForeground(gold);
-        JLabel tableHint = new JLabel("Click a row to auto-fill Loan ID");
-        tableHint.setFont(new Font("Dialog", Font.ITALIC, 11)); tableHint.setForeground(grayText);
-        tableHeader.add(tableTitle, BorderLayout.NORTH);
-        tableHeader.add(tableHint, BorderLayout.SOUTH);
-        tableCard.add(tableHeader, BorderLayout.NORTH);
-
-        String[] rCols = {"Loan ID", "Borrower", "Book Title", "Due Date", "Fine"};
-        activeLoansReturnModel = new DefaultTableModel(rCols, 0) {
-            public boolean isCellEditable(int r, int c) { return false; }
-        };
-        JTable returnRefTable = makeStyledTable(activeLoansReturnModel);
-        returnRefTable.getColumnModel().getColumn(0).setPreferredWidth(65);
-        returnRefTable.getColumnModel().getColumn(1).setPreferredWidth(150);
-        returnRefTable.getColumnModel().getColumn(2).setPreferredWidth(230);
-        returnRefTable.getColumnModel().getColumn(3).setPreferredWidth(100);
-        returnRefTable.getColumnModel().getColumn(4).setPreferredWidth(80);
-
-        // Overdue rows in red
-        returnRefTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-            public Component getTableCellRendererComponent(JTable t, Object v, boolean sel, boolean foc, int r, int c) {
-                super.getTableCellRendererComponent(t, v, sel, foc, r, c);
-                String fine = activeLoansReturnModel.getValueAt(r, 4).toString();
-                boolean overdue = !fine.equals("—") && !fine.equals("0.00");
-                if (sel) { setBackground(cardColor); setForeground(gold); }
-                else if (overdue) { setBackground(new Color(50, 10, 10)); setForeground(errColor); }
-                else { setBackground(r % 2 == 0 ? tableBg : tableAlt); setForeground(textColor); }
-                setBorder(new EmptyBorder(0, 10, 0, 10));
-                return this;
-            }
-        });
-
-        // Click row → fill loan ID field
-        returnRefTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent e) {
-                if (e.getValueIsAdjusting()) return;
-                int row = returnRefTable.getSelectedRow();
-                if (row >= 0) {
-                    txtReturnLoanId.setText(activeLoansReturnModel.getValueAt(row, 0).toString());
-                    lblFine.setText("—  Click Check Fine to calculate");
-                    lblFine.setForeground(textColor);
-                }
-            }
-        });
-
-        tableCard.add(makeScrollPane(returnRefTable), BorderLayout.CENTER);
-        cols.add(formCard);
-        cols.add(tableCard);
-        outer.add(cols, BorderLayout.CENTER);
-        return outer;
-    }
-
-    private void refreshActiveLoansReturnTable() {
-        if (activeLoansReturnModel == null) return;
-        activeLoansReturnModel.setRowCount(0);
-        try {
-            db database = new db();
-            java.util.List<String> loans = database.getAllActiveLoans();
-            database.closeConnection();
-            java.util.Date today = new java.util.Date();
-            for (String loan : loans) {
-                String loanId = "", borrowerName = "", title = "", due = "";
-                for (String p : loan.split(" \\| ")) {
-                    if      (p.startsWith("LoanID: "))         loanId       = p.replace("LoanID: ", "").trim();
-                    else if (p.startsWith("BorrowerName: "))   borrowerName = p.replace("BorrowerName: ", "").trim();
-                    else if (p.startsWith("Title: "))          title        = p.replace("Title: ", "").trim();
-                    else if (p.startsWith("Due: "))            due          = p.replace("Due: ", "").trim();
-                }
-                String fine = "—";
-                try {
-                    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
-                    java.util.Date dueDate  = sdf.parse(due);
-                    java.util.Date todayOnly = sdf.parse(sdf.format(today));
-                    long diff = todayOnly.getTime() - dueDate.getTime();
-                    long days = diff / (1000 * 60 * 60 * 24);
-                    if (days > 0) fine = String.format("%.2f", days * 5.0);
-                } catch (Exception ignored) {}
-                activeLoansReturnModel.addRow(new Object[]{loanId, borrowerName, title, due, fine});
-            }
-        } catch (Exception ex) { setStatus("Error loading loans: " + ex.getMessage(), errColor); }
+        card.add(body, BorderLayout.CENTER);
+        wrap.add(card);
+        return wrap;
     }
 
     private void doReturn(JLabel lblFine) {
@@ -1797,20 +1527,17 @@ public class GUI extends JFrame {
 
     private JTable borrowersTable;
     private DefaultTableModel borrowersModel;
-    private DefaultTableModel loansModel;          // bottom loans table
     private JTextField txtBorrName, txtBorrId, txtBorrSchool;
     private JComboBox<String> cmbBorrType;
-    private JLabel lblLoansHeader;                  // "Active Loans — All Borrowers" / per-name
 
     private JPanel buildBorrowersPanel() {
         JPanel outer = new JPanel(new BorderLayout());
         outer.setBackground(bgColor);
-        outer.setBorder(new EmptyBorder(20, 32, 20, 32));
+        outer.setBorder(new EmptyBorder(28, 32, 28, 32));
 
-        // ── TOP: Add-borrower bar ──────────────────────────────────
         JPanel addBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 0));
         addBar.setBackground(bgColor);
-        addBar.setBorder(new EmptyBorder(0, 0, 12, 0));
+        addBar.setBorder(new EmptyBorder(0, 0, 16, 0));
 
         txtBorrName = makeField("Full Name");
         txtBorrName.setPreferredSize(new Dimension(200, 38));
@@ -1832,23 +1559,18 @@ public class GUI extends JFrame {
         cmbBorrType.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 boolean isGuest = cmbBorrType.getSelectedItem().equals("Guest");
+                txtBorrId.setEnabled(!isGuest);
+                txtBorrId.setVisible(!isGuest);
                 txtBorrSchool.setVisible(isGuest);
                 if (isGuest) {
                     txtBorrId.setText("");
-                    txtBorrId.setEnabled(false);
-                    txtBorrId.setVisible(true);
-                    try {
-                        db database = new db();
-                        int nextId = database.getNextGuestId();
-                        database.closeConnection();
-                        txtBorrId.setText(String.valueOf(nextId));
-                    } catch (Exception ex) { txtBorrId.setText("10001"); }
-                } else {
-                    txtBorrId.setText("");
-                    txtBorrId.setEnabled(true);
-                    txtBorrId.setVisible(true);
+                    db database = new db();
+                    int nextId = database.getNextGuestId();
+                    database.closeConnection();
+                    txtBorrId.setText(String.valueOf(nextId));
                 }
-                addBar.revalidate(); addBar.repaint();
+                addBar.revalidate();
+                addBar.repaint();
             }
         });
 
@@ -1863,118 +1585,32 @@ public class GUI extends JFrame {
         addBar.add(btnAdd);
         outer.add(addBar, BorderLayout.NORTH);
 
-        // ── CENTRE: Split pane — borrowers top, loans bottom ──────
-        JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-        split.setBackground(bgColor);
-        split.setDividerSize(6);
-        split.setResizeWeight(0.45);
-        split.setBorder(null);
-
-        // — Borrowers table (top half) —
-        String[] bCols = {"ID No.", "Name", "Type", "School", "Active Loans", "Can Borrow"};
-        borrowersModel = new DefaultTableModel(bCols, 0) {
+        String[] cols = {"ID No.", "Name", "Type", "School", "Active Loans", "Can Borrow"};
+        borrowersModel = new DefaultTableModel(cols, 0) {
             public boolean isCellEditable(int r, int c) { return false; }
         };
         borrowersTable = makeStyledTable(borrowersModel);
-        borrowersTable.getColumnModel().getColumn(0).setPreferredWidth(110);
-        borrowersTable.getColumnModel().getColumn(1).setPreferredWidth(190);
+        borrowersTable.getColumnModel().getColumn(0).setPreferredWidth(100);
+        borrowersTable.getColumnModel().getColumn(1).setPreferredWidth(200);
         borrowersTable.getColumnModel().getColumn(2).setPreferredWidth(80);
         borrowersTable.getColumnModel().getColumn(3).setPreferredWidth(180);
-        borrowersTable.getColumnModel().getColumn(4).setPreferredWidth(95);
-        borrowersTable.getColumnModel().getColumn(5).setPreferredWidth(80);
-        borrowersTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        borrowersTable.getColumnModel().getColumn(4).setPreferredWidth(100);
+        borrowersTable.getColumnModel().getColumn(5).setPreferredWidth(90);
+        outer.add(makeScrollPane(borrowersTable), BorderLayout.CENTER);
 
-        JPanel topCard = new JPanel(new BorderLayout());
-        topCard.setBackground(cardColor);
-        topCard.setBorder(BorderFactory.createLineBorder(divColor, 1));
-        JLabel topTitle = new JLabel("  Registered Borrowers");
-        topTitle.setFont(new Font("Dialog", Font.BOLD, 12));
-        topTitle.setForeground(gold);
-        topTitle.setBorder(new EmptyBorder(10, 12, 10, 12));
-        topCard.add(topTitle, BorderLayout.NORTH);
-        topCard.add(makeScrollPane(borrowersTable), BorderLayout.CENTER);
-        split.setTopComponent(topCard);
-
-        // — Loans table (bottom half) —
-        String[] lCols = {"Loan ID", "Borrower ID", "Borrower Name", "Book Title", "Date Borrowed", "Due Date", "Status"};
-        loansModel = new DefaultTableModel(lCols, 0) {
-            public boolean isCellEditable(int r, int c) { return false; }
-        };
-        JTable loansTable = makeStyledTable(loansModel);
-        loansTable.getColumnModel().getColumn(0).setPreferredWidth(65);
-        loansTable.getColumnModel().getColumn(1).setPreferredWidth(100);
-        loansTable.getColumnModel().getColumn(2).setPreferredWidth(160);
-        loansTable.getColumnModel().getColumn(3).setPreferredWidth(220);
-        loansTable.getColumnModel().getColumn(4).setPreferredWidth(110);
-        loansTable.getColumnModel().getColumn(5).setPreferredWidth(110);
-        loansTable.getColumnModel().getColumn(6).setPreferredWidth(90);
-
-        // Custom renderer — highlight overdue rows in red tint
-        loansTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-            public Component getTableCellRendererComponent(JTable t, Object v, boolean sel, boolean foc, int r, int c) {
-                super.getTableCellRendererComponent(t, v, sel, foc, r, c);
-                String status = loansModel.getValueAt(r, 6) != null ? loansModel.getValueAt(r, 6).toString() : "";
-                if (sel) {
-                    setBackground(cardColor); setForeground(gold);
-                } else if (status.equals("OVERDUE")) {
-                    setBackground(new Color(60, 10, 10)); setForeground(errColor);
-                } else if (status.equals("Due Today")) {
-                    setBackground(new Color(50, 28, 5)); setForeground(warnColor);
-                } else {
-                    setBackground(r % 2 == 0 ? tableBg : tableAlt); setForeground(textColor);
-                }
-                setBorder(new EmptyBorder(0, 12, 0, 12));
-                return this;
-            }
+        JPanel bot = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        bot.setBackground(bgColor);
+        bot.setBorder(new EmptyBorder(14, 0, 0, 0));
+        JButton btnLoans = makeOutlineButton("View Active Loans");
+        btnLoans.setPreferredSize(new Dimension(170, 36));
+        btnLoans.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) { viewActiveLoans(); }
         });
-
-        JPanel bottomCard = new JPanel(new BorderLayout());
-        bottomCard.setBackground(cardColor);
-        bottomCard.setBorder(BorderFactory.createLineBorder(divColor, 1));
-
-        JPanel loansHeader = new JPanel(new BorderLayout());
-        loansHeader.setBackground(cardColor);
-        loansHeader.setBorder(new EmptyBorder(10, 12, 10, 12));
-        lblLoansHeader = new JLabel("  Active Loans — All Borrowers");
-        lblLoansHeader.setFont(new Font("Dialog", Font.BOLD, 12));
-        lblLoansHeader.setForeground(grayText);
-
-        JButton btnShowAll = makeOutlineButton("Show All");
-        btnShowAll.setPreferredSize(new Dimension(100, 30));
-        btnShowAll.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                borrowersTable.clearSelection();
-                refreshAllLoansTable();
-                lblLoansHeader.setText("  Active Loans — All Borrowers");
-                lblLoansHeader.setForeground(grayText);
-            }
-        });
-        loansHeader.add(lblLoansHeader, BorderLayout.CENTER);
-        loansHeader.add(btnShowAll, BorderLayout.EAST);
-        bottomCard.add(loansHeader, BorderLayout.NORTH);
-        bottomCard.add(makeScrollPane(loansTable), BorderLayout.CENTER);
-        split.setBottomComponent(bottomCard);
-
-        outer.add(split, BorderLayout.CENTER);
-
-        // ── Click a borrower row → filter loans table ─────────────
-        borrowersTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent e) {
-                if (e.getValueIsAdjusting()) return;
-                int row = borrowersTable.getSelectedRow();
-                if (row < 0) return;
-                String idStr = borrowersModel.getValueAt(row, 0).toString();
-                String name  = borrowersModel.getValueAt(row, 1).toString();
-                try {
-                    refreshLoansTableForBorrower(Integer.parseInt(idStr), name);
-                } catch (NumberFormatException ignored) {}
-            }
-        });
-
+        bot.add(btnLoans);
+        outer.add(bot, BorderLayout.SOUTH);
         return outer;
     }
 
-    /** Refresh borrowers table (top half) */
     private void refreshBorrowersTable() {
         borrowersModel.setRowCount(0);
         db database = new db();
@@ -2000,89 +1636,7 @@ public class GUI extends JFrame {
             borrowersModel.addRow(new Object[]{idNo, name, type, school, activeLoans, canBorrow ? "Yes" : "No"});
         }
         database.closeConnection();
-        refreshAllLoansTable();
         setStatus("Loaded " + borrowersModel.getRowCount() + " borrowers.", successColor);
-    }
-
-    /** Fill the bottom loans table with ALL active loans across every borrower */
-    private void refreshAllLoansTable() {
-        if (loansModel == null) return;
-        loansModel.setRowCount(0);
-        try {
-            db database = new db();
-            // Query all unreturned loans joined with borrower name and book title
-            List<String> allLoans = database.getAllActiveLoans();
-            database.closeConnection();
-            java.util.Date today = new java.util.Date();
-            for (String loan : allLoans) {
-                Object[] row = parseLoanRow(loan, today);
-                if (row != null) loansModel.addRow(row);
-            }
-        } catch (Exception ex) { setStatus("Error loading loans: " + ex.getMessage(), errColor); }
-        if (lblLoansHeader != null) {
-            lblLoansHeader.setText("  Active Loans — All Borrowers  (" + loansModel.getRowCount() + ")");
-            lblLoansHeader.setForeground(grayText);
-        }
-    }
-
-    /** Fill the bottom loans table filtered to one borrower */
-    private void refreshLoansTableForBorrower(int borrowerId, String name) {
-        if (loansModel == null) return;
-        loansModel.setRowCount(0);
-        try {
-            db database = new db();
-            List<String> loans = database.getActiveLoansByBorrower(borrowerId);
-            database.closeConnection();
-            java.util.Date today = new java.util.Date();
-            for (String loan : loans) {
-                // getActiveLoansByBorrower returns: LoanID | Title | Borrowed | Due
-                String loanId = "", title = "", borrowed = "", due = "";
-                for (String p : loan.split(" \\| ")) {
-                    if (p.startsWith("LoanID: "))     loanId   = p.replace("LoanID: ", "").trim();
-                    else if (p.startsWith("Title: "))  title    = p.replace("Title: ", "").trim();
-                    else if (p.startsWith("Borrowed: ")) borrowed = p.replace("Borrowed: ", "").trim();
-                    else if (p.startsWith("Due: "))    due      = p.replace("Due: ", "").trim();
-                }
-                String status = computeStatus(due, today);
-                loansModel.addRow(new Object[]{loanId, borrowerId, name, title, borrowed, due, status});
-            }
-        } catch (Exception ex) { setStatus("Error loading loans: " + ex.getMessage(), errColor); }
-        if (lblLoansHeader != null) {
-            int count = loansModel.getRowCount();
-            lblLoansHeader.setText("  Active Loans — " + name + "  (" + count + ")");
-            lblLoansHeader.setForeground(count > 0 ? gold : grayText);
-        }
-    }
-
-    /** Parse a loan string from getAllActiveLoans() into a table row object array */
-    private Object[] parseLoanRow(String loan, java.util.Date today) {
-        try {
-            String loanId = "", borrowerId = "", borrowerName = "", title = "", borrowed = "", due = "";
-            for (String p : loan.split(" \\| ")) {
-                if (p.startsWith("LoanID: "))         loanId       = p.replace("LoanID: ", "").trim();
-                else if (p.startsWith("BorrowerID: ")) borrowerId   = p.replace("BorrowerID: ", "").trim();
-                else if (p.startsWith("BorrowerName: ")) borrowerName = p.replace("BorrowerName: ", "").trim();
-                else if (p.startsWith("Title: "))      title        = p.replace("Title: ", "").trim();
-                else if (p.startsWith("Borrowed: "))   borrowed     = p.replace("Borrowed: ", "").trim();
-                else if (p.startsWith("Due: "))        due          = p.replace("Due: ", "").trim();
-            }
-            String status = computeStatus(due, today);
-            return new Object[]{loanId, borrowerId, borrowerName, title, borrowed, due, status};
-        } catch (Exception e) { return null; }
-    }
-
-    /** Returns "OVERDUE", "Due Today", or "Active" based on due date string vs today */
-    private String computeStatus(String dueDateStr, java.util.Date today) {
-        try {
-            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
-            java.util.Date due = sdf.parse(dueDateStr);
-            java.util.Date todayOnly = sdf.parse(sdf.format(today));
-            long diff = due.getTime() - todayOnly.getTime();
-            long days = diff / (1000 * 60 * 60 * 24);
-            if (days < 0)  return "OVERDUE";
-            if (days == 0) return "Due Today";
-            return "Active";
-        } catch (Exception e) { return "Active"; }
     }
 
     private void doAddBorrower() {
@@ -2120,110 +1674,50 @@ public class GUI extends JFrame {
         }
     }
 
-    // kept for compatibility but no longer called from a button
     private void viewActiveLoans() {
         int row = borrowersTable.getSelectedRow();
         if (row < 0) { setStatus("Select a borrower first.", warnColor); return; }
         String idStr = borrowersModel.getValueAt(row, 0).toString();
         String name  = borrowersModel.getValueAt(row, 1).toString();
-        try { refreshLoansTableForBorrower(Integer.parseInt(idStr), name); }
-        catch (NumberFormatException ex) { setStatus("Invalid ID.", errColor); }
+        try {
+            int idNo = Integer.parseInt(idStr);
+            db database = new db();
+            List<String> loans = database.getActiveLoansByBorrower(idNo);
+            database.closeConnection();
+            if (loans.isEmpty()) { JOptionPane.showMessageDialog(this, name + " has no active loans.", "Active Loans", JOptionPane.INFORMATION_MESSAGE); return; }
+            StringBuilder sb = new StringBuilder("Active loans for " + name + ":\n\n");
+            for (String l : loans) sb.append(l).append("\n");
+            JOptionPane.showMessageDialog(this, sb.toString(), "Active Loans", JOptionPane.INFORMATION_MESSAGE);
+        } catch (NumberFormatException ex) { setStatus("Invalid ID.", errColor); }
     }
 
     private JLabel lblTotalBooks, lblAvailBooks, lblTotalBorrowers, lblActiveLoans, lblOverdue;
-    private DefaultTableModel overdueModel;
 
+    // ─────────────────────────────────────────────────────────────
+    //  DASHBOARD  (larger stat numbers)
+    // ─────────────────────────────────────────────────────────────
     private JPanel buildDashboardPanel() {
         JPanel outer = new JPanel(new BorderLayout());
         outer.setBackground(bgColor);
-        outer.setBorder(new EmptyBorder(24, 32, 24, 32));
-
-        // ── Header row ────────────────────────────────────────────
-        JPanel headerRow = new JPanel(new BorderLayout());
-        headerRow.setBackground(bgColor);
-        headerRow.setBorder(new EmptyBorder(0, 0, 18, 0));
+        outer.setBorder(new EmptyBorder(32, 32, 32, 32));
         JLabel heading = new JLabel("Library Overview");
         heading.setFont(new Font("Georgia", Font.BOLD, 22));
         heading.setForeground(textColor);
-        JButton btnRefresh = makePrimaryButton("↻  Refresh");
-        btnRefresh.setPreferredSize(new Dimension(120, 34));
-        btnRefresh.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) { refreshDashboard(); }
-        });
-        headerRow.add(heading,    BorderLayout.WEST);
-        headerRow.add(btnRefresh, BorderLayout.EAST);
-        outer.add(headerRow, BorderLayout.NORTH);
+        heading.setBorder(new EmptyBorder(0, 0, 22, 0));
+        outer.add(heading, BorderLayout.NORTH);
 
-        // ── Stat cards row ────────────────────────────────────────
-        JPanel grid = new JPanel(new GridLayout(1, 5, 14, 0)) {
-            public Dimension getPreferredSize() { return new Dimension(super.getPreferredSize().width, 110); }
-            public Dimension getMinimumSize()   { return new Dimension(super.getMinimumSize().width,   110); }
-        };
+        JPanel grid = new JPanel(new GridLayout(2, 3, 18, 18));
         grid.setBackground(bgColor);
-        grid.setBorder(new EmptyBorder(0, 0, 14, 0));
-        lblTotalBooks     = new JLabel("—");
-        lblAvailBooks     = new JLabel("—");
-        lblTotalBorrowers = new JLabel("—");
-        lblActiveLoans    = new JLabel("—");
+        lblTotalBooks     = new JLabel("—"); lblAvailBooks    = new JLabel("—");
+        lblTotalBorrowers = new JLabel("—"); lblActiveLoans   = new JLabel("—");
         lblOverdue        = new JLabel("—");
-        grid.add(makeStatCard("Total Items",     lblTotalBooks,     gold));
-        grid.add(makeStatCard("Available",       lblAvailBooks,     successColor));
-        grid.add(makeStatCard("Borrowers",       lblTotalBorrowers, textColor));
+        grid.add(makeStatCard("Total Books",     lblTotalBooks,     gold));
+        grid.add(makeStatCard("Available Now",   lblAvailBooks,     successColor));
+        grid.add(makeStatCard("Total Borrowers", lblTotalBorrowers, textColor));
         grid.add(makeStatCard("Active Loans",    lblActiveLoans,    warnColor));
-        grid.add(makeStatCard("Overdue",         lblOverdue,        errColor));
-
-        // ── Overdue loans table ───────────────────────────────────
-        String[] cols = {"Loan ID", "Borrower ID", "Borrower Name", "Book / Item Title",
-                         "Date Borrowed", "Due Date", "Days Overdue", "Fine (PHP)"};
-        overdueModel = new DefaultTableModel(cols, 0) {
-            public boolean isCellEditable(int r, int c) { return false; }
-        };
-        JTable overdueTable = makeStyledTable(overdueModel);
-        overdueTable.getColumnModel().getColumn(0).setPreferredWidth(60);
-        overdueTable.getColumnModel().getColumn(1).setPreferredWidth(100);
-        overdueTable.getColumnModel().getColumn(2).setPreferredWidth(170);
-        overdueTable.getColumnModel().getColumn(3).setPreferredWidth(230);
-        overdueTable.getColumnModel().getColumn(4).setPreferredWidth(110);
-        overdueTable.getColumnModel().getColumn(5).setPreferredWidth(110);
-        overdueTable.getColumnModel().getColumn(6).setPreferredWidth(95);
-        overdueTable.getColumnModel().getColumn(7).setPreferredWidth(90);
-
-        // Colour every row red since they're all overdue — deeper red for 7+ days
-        overdueTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-            public Component getTableCellRendererComponent(JTable t, Object v,
-                    boolean sel, boolean foc, int r, int c) {
-                super.getTableCellRendererComponent(t, v, sel, foc, r, c);
-                int days = 0;
-                try { days = Integer.parseInt(overdueModel.getValueAt(r, 6).toString()); }
-                catch (Exception ignored) {}
-                if (sel) {
-                    setBackground(cardColor); setForeground(gold);
-                } else if (days >= 7) {
-                    setBackground(new Color(70, 8, 8));  setForeground(new Color(255, 120, 120));
-                } else {
-                    setBackground(new Color(45, 10, 10)); setForeground(errColor);
-                }
-                setBorder(new EmptyBorder(0, 12, 0, 12));
-                return this;
-            }
-        });
-
-        JPanel tableCard = new JPanel(new BorderLayout());
-        tableCard.setBackground(cardColor);
-        tableCard.setBorder(BorderFactory.createLineBorder(divColor, 1));
-        JLabel tableTitle = new JLabel("  ⚠  Overdue Loans — Action Required");
-        tableTitle.setFont(new Font("Dialog", Font.BOLD, 12));
-        tableTitle.setForeground(errColor);
-        tableTitle.setBorder(new EmptyBorder(10, 12, 10, 12));
-        tableCard.add(tableTitle,                  BorderLayout.NORTH);
-        tableCard.add(makeScrollPane(overdueTable), BorderLayout.CENTER);
-
-        // ── Assemble ──────────────────────────────────────────────
-        JPanel centre = new JPanel(new BorderLayout(0, 0));
-        centre.setBackground(bgColor);
-        centre.add(grid,      BorderLayout.NORTH);
-        centre.add(tableCard, BorderLayout.CENTER);
-        outer.add(centre, BorderLayout.CENTER);
+        grid.add(makeStatCard("Overdue Books",   lblOverdue,        errColor));
+        grid.add(makeRefreshCard());
+        outer.add(grid, BorderLayout.CENTER);
         return outer;
     }
 
@@ -2232,61 +1726,59 @@ public class GUI extends JFrame {
         card.setBackground(cardColor);
         card.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(divColor),
-            new EmptyBorder(14, 20, 14, 20)));
-        JLabel t = new JLabel(title.toUpperCase());
-        t.setFont(new Font("Dialog", Font.PLAIN, 10));
+            new EmptyBorder(24, 28, 24, 28)));
+        JLabel t = new JLabel(title);
+        t.setFont(new Font("Dialog", Font.PLAIN, 12));
         t.setForeground(grayText);
-        t.setBorder(new EmptyBorder(0, 0, 4, 0));
-        valueLabel.setFont(new Font("Georgia", Font.BOLD, 32));
+        valueLabel.setFont(new Font("Georgia", Font.BOLD, 42));  // bigger stat number
         valueLabel.setForeground(valueColor);
-        card.add(t,          BorderLayout.NORTH);
+        card.add(t, BorderLayout.NORTH);
         card.add(valueLabel, BorderLayout.CENTER);
         return card;
     }
 
+    private JPanel makeRefreshCard() {
+        JPanel card = new JPanel(new GridBagLayout());
+        card.setBackground(cardColor);
+        card.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(divColor),
+            new EmptyBorder(24, 28, 24, 28)));
+        JButton btn = makePrimaryButton("Refresh Stats");
+        btn.setPreferredSize(new Dimension(150, 46));
+        btn.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) { refreshDashboard(); } });
+        card.add(btn);
+        return card;
+    }
+
     private void refreshDashboard() {
-        // Single query for all 5 stats — no N+1 loop
         db database = new db();
-        int[] stats = database.getDashboardStats();
-        database.closeConnection();
-
-        lblTotalBooks.setText(String.valueOf(stats[0]));
-        lblAvailBooks.setText(String.valueOf(stats[1]));
-        lblTotalBorrowers.setText(String.valueOf(stats[2]));
-        lblActiveLoans.setText(String.valueOf(stats[3]));
-        lblOverdue.setText(String.valueOf(stats[4]));
-
-        // Flash overdue label red if there are any
-        lblOverdue.setForeground(stats[4] > 0 ? errColor : successColor);
-
-        // Populate overdue table
-        if (overdueModel != null) {
-            overdueModel.setRowCount(0);
-            db db2 = new db();
-            List<String> overdueList = db2.getOverdueLoans();
-            db2.closeConnection();
-            for (String loan : overdueList) {
-                String loanId = "", borrowerId = "", borrowerName = "",
-                       title = "", borrowed = "", due = "", daysStr = "";
-                for (String p : loan.split(" \\| ")) {
-                    if      (p.startsWith("LoanID: "))         loanId       = p.replace("LoanID: ", "").trim();
-                    else if (p.startsWith("BorrowerID: "))     borrowerId   = p.replace("BorrowerID: ", "").trim();
-                    else if (p.startsWith("BorrowerName: "))   borrowerName = p.replace("BorrowerName: ", "").trim();
-                    else if (p.startsWith("Title: "))          title        = p.replace("Title: ", "").trim();
-                    else if (p.startsWith("Borrowed: "))       borrowed     = p.replace("Borrowed: ", "").trim();
-                    else if (p.startsWith("Due: "))            due          = p.replace("Due: ", "").trim();
-                    else if (p.startsWith("DaysOverdue: "))    daysStr      = p.replace("DaysOverdue: ", "").trim();
+        List<String> allBooks = database.getAllBooks();
+        int total = allBooks.size();
+        int avail = 0;
+        for (String b : allBooks) if (b.contains("Can Borrow: true")) avail++;
+        List<String> allBorrowers = database.getAllBorrowers();
+        int totalBorrowers = allBorrowers.size();
+        int activeLoans = 0;
+        for (String b : allBorrowers) {
+            String[] parts = b.split(" \\| ");
+            for (String p : parts) {
+                if (p.startsWith("ID: ")) {
+                    try {
+                        int idNo = Integer.parseInt(p.replace("ID: ", "").trim());
+                        List<String> loans = database.getActiveLoansByBorrower(idNo);
+                        activeLoans += loans.size();
+                    } catch (Exception ignored) {}
                 }
-                int days = 0;
-                try { days = Integer.parseInt(daysStr); } catch (Exception ignored) {}
-                double fine = days * 5.0;
-                overdueModel.addRow(new Object[]{
-                    loanId, borrowerId, borrowerName, title,
-                    borrowed, due, days, String.format("%.2f", fine)
-                });
             }
         }
-        setStatus("Dashboard refreshed. " + stats[4] + " overdue loan(s).", stats[4] > 0 ? warnColor : successColor);
+        int checkedOut = total - avail;
+        database.closeConnection();
+        lblTotalBooks.setText(String.valueOf(total));
+        lblAvailBooks.setText(String.valueOf(avail));
+        lblTotalBorrowers.setText(String.valueOf(totalBorrowers));
+        lblActiveLoans.setText(String.valueOf(activeLoans));
+        lblOverdue.setText(String.valueOf(checkedOut > activeLoans ? checkedOut - activeLoans : 0));
+        setStatus("Dashboard refreshed.", successColor);
     }
 
     private JTextArea notifArea;
@@ -2450,6 +1942,24 @@ public class GUI extends JFrame {
         return row;
     }
 
+    private GridBagConstraints makeFC() {
+        GridBagConstraints fc = new GridBagConstraints();
+        fc.fill = GridBagConstraints.HORIZONTAL;
+        fc.anchor = GridBagConstraints.WEST;
+        return fc;
+    }
+
+    private void addRow(JPanel p, GridBagConstraints fc, String labelText, JTextField field, int row) {
+        fc.gridy = row; fc.gridx = 0; fc.weightx = 0; fc.gridwidth = 1; fc.insets = new Insets(8, 0, 8, 10);
+        JLabel lbl = new JLabel(labelText);
+        lbl.setFont(new Font("Dialog", Font.BOLD, 12));
+        lbl.setForeground(grayText);
+        lbl.setPreferredSize(new Dimension(120, 22));
+        p.add(lbl, fc);
+        fc.gridx = 1; fc.weightx = 1; fc.gridwidth = 3; fc.insets = new Insets(8, 0, 8, 0);
+        p.add(field, fc);
+    }
+
     private JTextField makeField(final String placeholder) {
         JTextField tf = new JTextField() {
             protected void paintComponent(Graphics g) {
@@ -2470,7 +1980,7 @@ public class GUI extends JFrame {
         tf.setForeground(textColor);
         tf.setBackground(fieldBg);
         tf.setCaretColor(gold);
-        tf.setPreferredSize(new Dimension(0, 42));
+        tf.setPreferredSize(new Dimension(0, 42));   // taller fields
         tf.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(fieldBorder, 1),
             new EmptyBorder(5, 12, 5, 12)));
@@ -2502,7 +2012,7 @@ public class GUI extends JFrame {
         JTable table = new JTable(model);
         table.setBackground(tableBg); table.setForeground(textColor);
         table.setGridColor(divColor);
-        table.setRowHeight(34);
+        table.setRowHeight(34);   // taller rows
         table.setFont(new Font("Dialog", Font.PLAIN, 13));
         table.setSelectionBackground(cardColor); table.setSelectionForeground(gold);
         table.setShowHorizontalLines(true); table.setShowVerticalLines(false);
@@ -2575,6 +2085,35 @@ public class GUI extends JFrame {
         btn.setPreferredSize(new Dimension(125, 40));
         return btn;
     }
+
+    private JPanel makeCard(String title, String subtitle, int w, int h) {
+        JPanel card = new JPanel(new BorderLayout());
+        card.setBackground(cardColor);
+        card.setBorder(BorderFactory.createLineBorder(divColor, 1));
+        card.setPreferredSize(new Dimension(w, h));
+        JPanel strip = new JPanel(new GridLayout(1, 2));
+        strip.setPreferredSize(new Dimension(0, 4));
+        JPanel g1 = new JPanel(); g1.setBackground(gold);
+        JPanel g2 = new JPanel(); g2.setBackground(red);
+        strip.add(g1); strip.add(g2);
+        JPanel header = new JPanel(new BorderLayout());
+        header.setBackground(cardColor);
+        header.setBorder(new EmptyBorder(18, 30, 14, 30));
+        JLabel t = new JLabel(title);
+        t.setFont(new Font("Georgia", Font.BOLD, 20)); t.setForeground(textColor);
+        JLabel s = new JLabel(subtitle);
+        s.setFont(new Font("Dialog", Font.PLAIN, 12)); s.setForeground(grayText);
+        header.add(t, BorderLayout.NORTH); header.add(s, BorderLayout.SOUTH);
+        JPanel north = new JPanel(new BorderLayout());
+        north.setBackground(cardColor);
+        north.add(strip, BorderLayout.NORTH);
+        north.add(header, BorderLayout.CENTER);
+        north.add(new JSeparator() {{ setForeground(divColor); }}, BorderLayout.SOUTH);
+        card.add(north, BorderLayout.NORTH);
+        return card;
+    }
+
+    private void addFormToCard(JPanel card, JPanel form) { card.add(form, BorderLayout.SOUTH); }
 
     private void setStatus(String msg, Color color) { lblStatus.setText(msg); lblStatus.setForeground(color); }
 }
