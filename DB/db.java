@@ -42,9 +42,8 @@ public class db {
 
     // ─────────────────────────────────────────────────────────────
     //  BOOK — add / update / delete / search / display
-    //  (matches UML: Library Database methods)
     // ─────────────────────────────────────────────────────────────
-    public boolean addBook(book b) {
+    public boolean addBook(Book b) {
         String sql = "INSERT INTO Book (title, type, genre, deweyDecimal, canBorrow) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, b.getTitle());
@@ -61,10 +60,6 @@ public class db {
         }
     }
 
-    /**
-     * Add any catalog item by media type.
-     * canBorrow is automatically false for ReferenceBook, true for everything else.
-     */
     public boolean addBookTyped(String title, String mediaType, String genre, String dewey) {
         boolean canBorrow = !mediaType.equals("ReferenceBook");
         String sql = "INSERT INTO Book (title, type, genre, deweyDecimal, canBorrow) VALUES (?, ?, ?, ?, ?)";
@@ -154,7 +149,6 @@ public class db {
         }
     }
 
-    /** UML: status() — returns the canBorrow status of a book by ID */
     public String getBookStatus(int bookId) {
         String sql = "SELECT title, canBorrow FROM Book WHERE id=?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -171,8 +165,7 @@ public class db {
     }
 
     // ─────────────────────────────────────────────────────────────
-    //  BORROWER — add / get / canBorrow / borrowCount
-    //  (matches UML: Borrower — name, idNo, borrowLimit=5)
+    //  BORROWER
     // ─────────────────────────────────────────────────────────────
     public boolean addBorrower(String name, int idNo, String borrowerType, String school) {
         String sql = "INSERT INTO Borrower (name, idNo, borrowLimit, borrowerType, school) VALUES (?, ?, 5, ?, ?)";
@@ -222,10 +215,9 @@ public class db {
         return list;
     }
 
-    /** UML: canBorrow() — checks if borrower has not hit their limit */
     public boolean canBorrow(int borrowerIdNo) {
-        String sql = "SELECT borrowLimit FROM Borrower WHERE idNo=?";
-        String countSql = "SELECT COUNT(*) FROM BorrowingSystem WHERE borrowerIdNo=? AND dateReturned IS NULL";
+        String sql     = "SELECT borrowLimit FROM Borrower WHERE idNo=?";
+        String countSql= "SELECT COUNT(*) FROM BorrowingSystem WHERE borrowerIdNo=? AND dateReturned IS NULL";
         try {
             int limit = 5;
             try (PreparedStatement s = connection.prepareStatement(sql)) {
@@ -236,10 +228,7 @@ public class db {
             try (PreparedStatement s = connection.prepareStatement(countSql)) {
                 s.setInt(1, borrowerIdNo);
                 ResultSet rs = s.executeQuery();
-                if (rs.next()) {
-                    int activeLoans = rs.getInt(1);
-                    return activeLoans < limit;
-                }
+                if (rs.next()) return rs.getInt(1) < limit;
             }
         } catch (SQLException e) {
             System.out.println("Error checking borrow limit: " + e.getMessage());
@@ -248,19 +237,15 @@ public class db {
     }
 
     // ─────────────────────────────────────────────────────────────
-    //  BORROWING SYSTEM — checkout / return / fine / dates
-    //  (matches UML: BorrowingSystem — checkout(), return(),
-    //   calculateOverdueFine(), dateBorrowed, dateReturned, dueDate)
+    //  BORROWING SYSTEM
     // ─────────────────────────────────────────────────────────────
-
-    /** UML: checkout() — creates a borrow record; dueDate = 14 days from today */
     public boolean checkoutBook(int bookId, int borrowerIdNo, String borrowedCondition) {
         if (!canBorrow(borrowerIdNo)) {
             System.out.println("Borrower has reached their borrow limit.");
             return false;
         }
-        String sql = "INSERT INTO BorrowingSystem (bookId, borrowerIdNo, dateBorrowed, dueDate, borrowedCondition) " +
-                     "VALUES (?, ?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 14 DAY), ?)";
+        String sql        = "INSERT INTO BorrowingSystem (bookId, borrowerIdNo, dateBorrowed, dueDate, borrowedCondition) " +
+                            "VALUES (?, ?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 14 DAY), ?)";
         String updateBook = "UPDATE Book SET canBorrow=false WHERE id=?";
         try (PreparedStatement stmt = connection.prepareStatement(sql);
              PreparedStatement upd  = connection.prepareStatement(updateBook)) {
@@ -278,11 +263,10 @@ public class db {
         }
     }
 
-    /** UML: return() — records the return date and marks book available */
     public boolean returnBook(int borrowId) {
-        String getBookId = "SELECT bookId FROM BorrowingSystem WHERE id=?";
-        String sql       = "UPDATE BorrowingSystem SET dateReturned=CURDATE() WHERE id=?";
-        String updateBook= "UPDATE Book SET canBorrow=true WHERE id=?";
+        String getBookId  = "SELECT bookId FROM BorrowingSystem WHERE id=?";
+        String sql        = "UPDATE BorrowingSystem SET dateReturned=CURDATE() WHERE id=?";
+        String updateBook = "UPDATE Book SET canBorrow=true WHERE id=?";
         try {
             int bookId = -1;
             try (PreparedStatement s = connection.prepareStatement(getBookId)) {
@@ -308,7 +292,6 @@ public class db {
         }
     }
 
-    /** UML: calculateOverdueFine() — PHP 5.00 per day overdue */
     public double calculateOverdueFine(int borrowId) {
         String sql = "SELECT dueDate, dateReturned FROM BorrowingSystem WHERE id=?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -332,7 +315,6 @@ public class db {
         return 0.0;
     }
 
-    /** UML: dateBorrowed() — get the date a book was borrowed */
     public String getDateBorrowed(int borrowId) {
         String sql = "SELECT dateBorrowed FROM BorrowingSystem WHERE id=?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -345,7 +327,6 @@ public class db {
         return "N/A";
     }
 
-    /** UML: dateReturned() — get the return date of a borrow record */
     public String getDateReturned(int borrowId) {
         String sql = "SELECT dateReturned FROM BorrowingSystem WHERE id=?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -361,20 +342,21 @@ public class db {
         return "N/A";
     }
 
-    /** Get all active (unreturned) loans for a borrower */
+    /** Get all active (unreturned) loans for a specific borrower */
     public List<String> getActiveLoansByBorrower(int borrowerIdNo) {
         List<String> loans = new ArrayList<String>();
         String sql = "SELECT bs.id, b.title, bs.dateBorrowed, bs.dueDate " +
                      "FROM BorrowingSystem bs JOIN Book b ON bs.bookId = b.id " +
-                     "WHERE bs.borrowerIdNo=? AND bs.dateReturned IS NULL";
+                     "WHERE bs.borrowerIdNo=? AND bs.dateReturned IS NULL " +
+                     "ORDER BY bs.dueDate ASC";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, borrowerIdNo);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                loans.add("LoanID: "        + rs.getInt("id")
-                        + " | Title: "      + rs.getString("title")
-                        + " | Borrowed: "   + rs.getString("dateBorrowed")
-                        + " | Due: "        + rs.getString("dueDate"));
+                loans.add("LoanID: "      + rs.getInt("id")
+                        + " | Title: "    + rs.getString("title")
+                        + " | Borrowed: " + rs.getString("dateBorrowed")
+                        + " | Due: "      + rs.getString("dueDate"));
             }
         } catch (SQLException e) {
             System.out.println("Error fetching loans: " + e.getMessage());
@@ -382,11 +364,126 @@ public class db {
         return loans;
     }
 
+    /**
+     * Get completed (returned) loan history for a specific borrower.
+     * Used by the student My Loans > Borrow History table.
+     */
+    public List<String> getBorrowHistoryForBorrower(int borrowerIdNo) {
+        List<String> history = new ArrayList<String>();
+        String sql = "SELECT bs.id, b.title, bs.dateBorrowed, bs.dateReturned " +
+                     "FROM BorrowingSystem bs JOIN Book b ON bs.bookId = b.id " +
+                     "WHERE bs.borrowerIdNo = ? AND bs.dateReturned IS NOT NULL " +
+                     "ORDER BY bs.dateReturned DESC";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, borrowerIdNo);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                history.add("LoanID: "     + rs.getInt("id")
+                        + " | Title: "     + rs.getString("title")
+                        + " | Borrowed: "  + rs.getString("dateBorrowed")
+                        + " | Returned: "  + rs.getString("dateReturned"));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching borrow history: " + e.getMessage());
+        }
+        return history;
+    }
+
+    /**
+     * NEW — Get ALL active (unreturned) loans across all borrowers,
+     * joined with borrower name and book title.
+     * Used by the bottom loans table in the Borrowers panel.
+     * Sorted by dueDate ASC so overdue rows appear first.
+     */
+    public List<String> getAllActiveLoans() {
+        List<String> loans = new ArrayList<String>();
+        String sql = "SELECT bs.id, br.idNo, br.name, b.title, bs.dateBorrowed, bs.dueDate " +
+                     "FROM BorrowingSystem bs " +
+                     "JOIN Book b     ON bs.bookId       = b.id " +
+                     "JOIN Borrower br ON bs.borrowerIdNo = br.idNo " +
+                     "WHERE bs.dateReturned IS NULL " +
+                     "ORDER BY bs.dueDate ASC";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs   = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                loans.add("LoanID: "          + rs.getInt("id")
+                        + " | BorrowerID: "   + rs.getInt("idNo")
+                        + " | BorrowerName: " + rs.getString("name")
+                        + " | Title: "        + rs.getString("title")
+                        + " | Borrowed: "     + rs.getString("dateBorrowed")
+                        + " | Due: "          + rs.getString("dueDate"));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching all active loans: " + e.getMessage());
+        }
+        return loans;
+    }
+
+    /**
+     * Returns 5 dashboard counts in a single DB round-trip:
+     * [0] totalBooks, [1] availableBooks, [2] totalBorrowers,
+     * [3] activeLoans, [4] overdueLoans
+     */
+    public int[] getDashboardStats() {
+        int[] stats = {0, 0, 0, 0, 0};
+        try {
+            String sql =
+                "SELECT " +
+                "  (SELECT COUNT(*) FROM Book) AS totalBooks, " +
+                "  (SELECT COUNT(*) FROM Book WHERE canBorrow = TRUE) AS availBooks, " +
+                "  (SELECT COUNT(*) FROM Borrower) AS totalBorrowers, " +
+                "  (SELECT COUNT(*) FROM BorrowingSystem WHERE dateReturned IS NULL) AS activeLoans, " +
+                "  (SELECT COUNT(*) FROM BorrowingSystem WHERE dateReturned IS NULL AND dueDate < CURDATE()) AS overdueLoans";
+            try (Statement stmt = connection.createStatement();
+                 ResultSet rs   = stmt.executeQuery(sql)) {
+                if (rs.next()) {
+                    stats[0] = rs.getInt("totalBooks");
+                    stats[1] = rs.getInt("availBooks");
+                    stats[2] = rs.getInt("totalBorrowers");
+                    stats[3] = rs.getInt("activeLoans");
+                    stats[4] = rs.getInt("overdueLoans");
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching dashboard stats: " + e.getMessage());
+        }
+        return stats;
+    }
+
+    /**
+     * Returns all currently overdue loans (dateReturned IS NULL AND dueDate < TODAY),
+     * joined with borrower name and book title, sorted most overdue first.
+     */
+    public List<String> getOverdueLoans() {
+        List<String> loans = new ArrayList<String>();
+        String sql =
+            "SELECT bs.id, br.idNo, br.name, b.title, bs.dateBorrowed, bs.dueDate, " +
+            "       DATEDIFF(CURDATE(), bs.dueDate) AS daysOverdue " +
+            "FROM BorrowingSystem bs " +
+            "JOIN Book     b  ON bs.bookId       = b.id " +
+            "JOIN Borrower br ON bs.borrowerIdNo = br.idNo " +
+            "WHERE bs.dateReturned IS NULL AND bs.dueDate < CURDATE() " +
+            "ORDER BY daysOverdue DESC";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs   = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                loans.add("LoanID: "          + rs.getInt("id")
+                        + " | BorrowerID: "   + rs.getInt("idNo")
+                        + " | BorrowerName: " + rs.getString("name")
+                        + " | Title: "        + rs.getString("title")
+                        + " | Borrowed: "     + rs.getString("dateBorrowed")
+                        + " | Due: "          + rs.getString("dueDate")
+                        + " | DaysOverdue: "  + rs.getInt("daysOverdue"));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching overdue loans: " + e.getMessage());
+        }
+        return loans;
+    }
+
     // ─────────────────────────────────────────────────────────────
     //  NOTIFICATION
-    //  (matches UML: Notification — notificationID, operations())
     // ─────────────────────────────────────────────────────────────
-
     public boolean sendNotification(int borrowerIdNo, String message) {
         String sql = "INSERT INTO Notification (borrowerIdNo, message, sentDate) VALUES (?, ?, NOW())";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -416,7 +513,6 @@ public class db {
         return notes;
     }
 
-    /** Auto-notify all borrowers with overdue books (call this on app startup or daily) */
     public void notifyOverdueBorrowers() {
         String sql = "SELECT bs.id, bs.borrowerIdNo, b.title, bs.dueDate " +
                      "FROM BorrowingSystem bs JOIN Book b ON bs.bookId = b.id " +
@@ -437,16 +533,13 @@ public class db {
     }
 
     // ─────────────────────────────────────────────────────────────
-    //  DATA VALIDATION (UML: validateInput, checkConstraints, validateDDC)
+    //  DATA VALIDATION
     // ─────────────────────────────────────────────────────────────
-
-    /** UML: validateDDC() — checks that a Dewey Decimal string is properly formatted */
     public boolean validateDDC(String ddc) {
         if (ddc == null || ddc.trim().isEmpty()) return false;
         return ddc.matches("\\d{3}(\\.\\d+)?");
     }
 
-    /** UML: validateInput() — checks that required book fields are non-empty */
     public List<String> validateBookInput(String title, String type, String genre, String dewey) {
         List<String> errors = new ArrayList<String>();
         if (title  == null || title.trim().isEmpty())  errors.add("Title is required.");
@@ -457,7 +550,6 @@ public class db {
         return errors;
     }
 
-    /** UML: checkConstraints() — verifies a book ID exists in the DB */
     public boolean bookExists(int bookId) {
         String sql = "SELECT id FROM Book WHERE id=?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -470,7 +562,6 @@ public class db {
         return false;
     }
 
-    /** UML: checkConstraints() — verifies a borrower ID exists in the DB */
     public boolean borrowerExists(int idNo) {
         String sql = "SELECT idNo FROM Borrower WHERE idNo=?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -484,10 +575,8 @@ public class db {
     }
 
     // ─────────────────────────────────────────────────────────────
-    //  EXCEPTION HANDLER (UML: errorCode, errorMessage, timeGenerated)
+    //  EXCEPTION HANDLER
     // ─────────────────────────────────────────────────────────────
-
-    /** Logs an application error to the ExceptionLog table */
     public void logException(int errorCode, String errorMessage) {
         String sql = "INSERT INTO ExceptionLog (errorCode, errorMessage, timeGenerated) VALUES (?, ?, NOW())";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -507,8 +596,8 @@ public class db {
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 log.add("[" + rs.getString("timeGenerated") + "]"
-                        + " Code: "    + rs.getInt("errorCode")
-                        + " | Msg: "   + rs.getString("errorMessage"));
+                        + " Code: "  + rs.getInt("errorCode")
+                        + " | Msg: " + rs.getString("errorMessage"));
             }
         } catch (SQLException e) {
             System.out.println("Error fetching exception log: " + e.getMessage());
