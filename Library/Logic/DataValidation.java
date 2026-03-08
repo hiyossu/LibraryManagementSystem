@@ -1,6 +1,6 @@
 package Library.Logic;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +15,7 @@ public class DataValidation {
     private int currentPages;
     private String currentType;
     private String currentGenre;
-    private LocalDate currentYearPublished;
+    private LocalDateTime currentYearPublished;
 
     // Constructor
     public DataValidation() {
@@ -56,7 +56,7 @@ public class DataValidation {
 
     // checkConstraints
     public boolean checkConstraints(String isbn, String title, String author,
-                                    String ddsCode, int pages, LocalDate yearPublished, String type, String genre) {
+                                    String ddsCode, int pages, LocalDateTime yearPublished, String type, String genre) {
         clearErrors();
         if (isbn == null || !isbn.replaceAll("-", "").trim().matches("\\d{10}|\\d{13}")) 
             errorList.add("ISBN must be 10 or 13 digits.");
@@ -65,7 +65,7 @@ public class DataValidation {
         if (ddsCode == null || !ddsCode.trim().matches("\\d{3}(\\.\\d+)?")) 
             errorList.add("DDS Code format error.");
         if (pages <= 0) errorList.add("Pages must be > 0.");
-        if (yearPublished == null || yearPublished.isAfter(LocalDate.now())) 
+        if (yearPublished == null || yearPublished.isAfter(LocalDateTime.now())) 
             errorList.add("Invalid publication date.");
         if (type == null || type.trim().isEmpty()) errorList.add("Media Type is required.");
         if (genre == null || genre.trim().isEmpty()) errorList.add("Genre is required.");
@@ -85,7 +85,7 @@ public class DataValidation {
         return true;
     }
 
-    public void setInputFields(String title, String type, String genre, String deweyDecimal, String isbn, String author, int pages, LocalDate yearPublished){
+    public void setInputFields(String title, String type, String genre, String deweyDecimal, String isbn, String author, int pages, LocalDateTime yearPublished){
         this.currentIsbn = isbn;
         this.currentTitle = title;
         this.currentAuthor = author;
@@ -123,7 +123,7 @@ public class DataValidation {
         return errorList.isEmpty();
     }
 
-    public boolean isYearPublishedValid(LocalDate publishDate) {
-        return !publishDate.isAfter(LocalDate.now());
+    public boolean isYearPublishedValid(LocalDateTime publishDate) {
+        return !publishDate.isAfter(LocalDateTime.now());
     }
 }

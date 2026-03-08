@@ -1,15 +1,15 @@
 package Library.Logic;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class ExceptionHandler {
     private int errorCode;
     private String errorMessage;
-    private LocalDate timeGenerated;
+    private LocalDateTime timeGenerated;
 
     public ExceptionHandler(int errorCode, String errorMessage) {
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
-        this.timeGenerated = LocalDate.now();
+        this.timeGenerated = LocalDateTime.now();
     }
 
     public String getMessage(){
@@ -19,7 +19,7 @@ public class ExceptionHandler {
         return errorCode;
     }
 
-    public LocalDate getTimeGenerated() {
+    public LocalDateTime getTimeGenerated() {
         return timeGenerated;
     }
 

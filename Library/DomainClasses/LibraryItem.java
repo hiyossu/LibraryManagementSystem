@@ -1,4 +1,4 @@
-package Library;
+package Library.DomainClasses;
 
 public abstract class LibraryItem {
 

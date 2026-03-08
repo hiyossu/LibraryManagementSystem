@@ -1,5 +1,4 @@
-package Library;
-
+package Library.DomainClasses;
 public class DVD extends LibraryItem implements isBorrowable {
 
     private String  genre;

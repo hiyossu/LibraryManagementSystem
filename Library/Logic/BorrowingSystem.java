@@ -1,20 +1,20 @@
 package Library.Logic;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
 public class BorrowingSystem {
-    private LocalDate dateBorrowed;
-    private LocalDate dateReturned;
-    private LocalDate dueDate;
+    private LocalDateTime dateBorrowed;
+    private LocalDateTime dateReturned;
+    private LocalDateTime dueDate;
     private String borrowedCondition;
     private double fineAmount = 0.0;
 
     private DataValidation validator;
     private List<ExceptionHandler> exceptionHandlers =  new ArrayList<>();
 
-    public BorrowingSystem(LocalDate dateBorrowed, LocalDate dateReturned, LocalDate dueDate, String borrowedCondition){
+    public BorrowingSystem(LocalDateTime dateBorrowed, LocalDateTime dateReturned, LocalDateTime dueDate, String borrowedCondition){
         this.dateBorrowed = dateBorrowed;
         this.dateReturned = dateReturned;
         this.dueDate = dateBorrowed.plusWeeks(1);
@@ -30,7 +30,7 @@ public class BorrowingSystem {
         }
     }
 
-    public void checkout(String isbn, String title, String author, String ddsCode, int pages, LocalDate yearPublished, String type, String genre){
+    public void checkout(String isbn, String title, String author, String ddsCode, int pages, LocalDateTime yearPublished, String type, String genre){
         exceptionHandlers.clear();
         boolean isValid = validator.checkConstraints(isbn, title, author, ddsCode, pages, yearPublished, type, genre);
         if(!isValid){
@@ -61,13 +61,13 @@ public class BorrowingSystem {
     }
 
     public static void main(String[] args) {
-        LocalDate today = LocalDate.now();
-        LocalDate lastWeek = today.minusWeeks(1);
-        LocalDate yesterday = today.minusDays(1);
+        LocalDateTime today = LocalDateTime.now();
+        LocalDateTime lastWeek = today.minusWeeks(1);
+        LocalDateTime yesterday = today.minusDays(1);
 
         BorrowingSystem session = new BorrowingSystem(lastWeek, today, yesterday, "Good");
         
-        session.checkout("1234567890", "Java Logic", "Author Name", "005.1", 250, LocalDate.of(2025, 1, 1), "Book", "Programming");
+        session.checkout("1234567890", "Java Logic", "Author Name", "005.1", 250, LocalDateTime.of(2025, 1, 1, 0, 0), "Book", "Programming");
         System.out.println("---");
         session.returnItem();
     }

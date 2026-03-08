@@ -1,6 +1,5 @@
-package Library;
-
-import java.time.LocalDate;
+package Library.DomainClasses;
+import java.time.LocalDateTime;
 
 public class Book extends LibraryItem implements isBorrowable {
 
@@ -9,11 +8,11 @@ public class Book extends LibraryItem implements isBorrowable {
     private final String    isbn;
     private final String    author;
     private final int       pages;
-    private final LocalDate yearPublished;
+    private final LocalDateTime yearPublished;
     protected boolean       canBorrow;
 
     public Book(String title, String type, String genre, String deweyDecimal,
-                String isbn, String author, int pages, LocalDate yearPublished) {
+                String isbn, String author, int pages, LocalDateTime yearPublished) {
         super(title, type);
         this.genre         = genre;
         this.deweyDecimal  = deweyDecimal;
@@ -25,7 +24,7 @@ public class Book extends LibraryItem implements isBorrowable {
     }
 
     public Book(String title, String type, String genre, String deweyDecimal) {
-        this(title, type, genre, deweyDecimal, "", "", 0, LocalDate.now());
+        this(title, type, genre, deweyDecimal, "", "", 0, LocalDateTime.now());
     }
 
     // ── Getters ───────────────────────────────────────────────────────────
@@ -34,7 +33,7 @@ public class Book extends LibraryItem implements isBorrowable {
     public String    getIsbn()         { return isbn;          }
     public String    getAuthor()       { return author;        }
     public int       getPages()        { return pages;         }
-    public LocalDate getYearPublished(){ return yearPublished; }
+    public LocalDateTime getYearPublished(){ return yearPublished; }
 
     // ── isBorrowable ──────────────────────────────────────────────────────
     @Override

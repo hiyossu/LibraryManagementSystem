@@ -1,5 +1,4 @@
-package Library;
-
+package Library.DomainClasses;
 
 public class BoardGame extends LibraryItem implements isBorrowable {
 
