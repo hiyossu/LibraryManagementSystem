@@ -26,4 +26,3 @@ public class ExceptionHandler {
         System.err.println("[" + timeGenerated + "] ERROR " + errorCode + ": " + errorMessage);
     }
 }
- s

@@ -1,6 +1,6 @@
 package Library.DomainClasses;
 
-public class BoardGame extends LibraryItem implements isBorrowable {
+public abstract class BoardGame extends LibraryItem implements isBorrowable {
 
     protected boolean canBorrow;
 

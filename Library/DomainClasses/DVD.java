@@ -1,6 +1,6 @@
 package Library.DomainClasses;
 
-public class DVD extends LibraryItem implements isBorrowable {
+public abstract class DVD extends LibraryItem implements isBorrowable {
 
     private String    genre;
     protected boolean canBorrow;

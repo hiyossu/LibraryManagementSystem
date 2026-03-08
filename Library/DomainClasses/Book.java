@@ -1,8 +1,7 @@
 package Library.DomainClasses;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
  
-public class Book extends LibraryItem implements isBorrowable {
+public abstract class Book extends LibraryItem implements isBorrowable {
  
     private final String    genre;
     private final String    deweyDecimal;
