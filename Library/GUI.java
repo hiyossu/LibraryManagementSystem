@@ -127,6 +127,8 @@ public class GUI extends JFrame {
         sidebar.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, divColor));
 
         sidebar.add(buildLogoArea());
+        sidebar.add(makeDividerLabel("PEOPLE"));
+        sidebar.add(makeNavBtn("  Borrowers",      "borrowers"));
         sidebar.add(makeDividerLabel("CATALOG"));
         sidebar.add(makeNavBtn("+ Add New Book",   "add"));
         sidebar.add(makeNavBtn("  Search Books",   "search"));
@@ -140,8 +142,6 @@ public class GUI extends JFrame {
         sidebar.add(makeNavBtn("  Magazine",        "add_magazine"));
         sidebar.add(makeDividerLabel("REFERENCE"));
         sidebar.add(makeNavBtn("  Reference Book", "add_reference"));
-        sidebar.add(makeDividerLabel("PEOPLE"));
-        sidebar.add(makeNavBtn("  Borrowers",      "borrowers"));
         sidebar.add(makeDividerLabel("SYSTEM"));
         sidebar.add(makeNavBtn("  Dashboard",      "dashboard"));
         sidebar.add(makeNavBtn("  Notifications",  "notifications"));
@@ -234,7 +234,7 @@ public class GUI extends JFrame {
             public void mouseExited (MouseEvent e) { if (btn != activeNavBtn) btn.setBackground(sidebarColor); }
             public void mouseClicked(MouseEvent e) { navigateTo(action, btn); }
         });
-        if (action.equals("add")) setActiveNav(btn, lbl);
+        if (action.equals("borrowers")) setActiveNav(btn, lbl);
         return btn;
     }
 
@@ -355,6 +355,9 @@ public class GUI extends JFrame {
         statusBar.add(lblStatus, BorderLayout.CENTER);
         statusBar.add(brand,     BorderLayout.EAST);
         main.add(statusBar, BorderLayout.SOUTH);
+
+        cardLayout.show(mainContent, "BORROWERS");
+        updateTopBar("Manage Borrowers", "People / Borrowers");
         return main;
     }
 
