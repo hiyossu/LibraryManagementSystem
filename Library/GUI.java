@@ -83,7 +83,7 @@ public class GUI extends JFrame {
         iconEmblem = loadIcon("logo_emblem_small.png", 100, 75);
         iconText   = loadIcon("logo_text_small.png",   150, 53);
     }
-
+    
     private ImageIcon loadIcon(String filename, int maxW, int maxH) {
         java.io.File classLocation = null;
         try {
