@@ -1,23 +1,18 @@
 package Library.Actions;
 
 import DB.db;
-import Library.BoardGame;
+import Library.DomainClasses.BoardGame;
 import Library.FormContext;
-
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-/**
- * Handles the "Add to Catalog" action for board games.
- */
 public class BoardGameActions {
 
     private final FormContext ctx;
     private final JFrame      owner;
 
     public BoardGameActions(FormContext ctx, JFrame owner) {
-        this.ctx   = ctx;
-        this.owner = owner;
+        this.ctx = ctx; this.owner = owner;
     }
 
     public void addRecord() {

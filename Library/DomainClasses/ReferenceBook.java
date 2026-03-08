@@ -1,9 +1,9 @@
-package Library;
+package Library.DomainClasses;
 
 public class ReferenceBook extends LibraryItem implements isBorrowable {
 
-    private String  genre;
-    private String  deweyDecimal;
+    private String    genre;
+    private String    deweyDecimal;
     protected boolean canBorrow;
 
     public ReferenceBook(String title, String type, String genre,
@@ -14,15 +14,9 @@ public class ReferenceBook extends LibraryItem implements isBorrowable {
         this.canBorrow    = canBorrow;
     }
 
-    // ── isBorrowable ──────────────────────────────────────────────────────
-    @Override
-    public boolean canBorrow() { return canBorrow; }  // FIX: was hardcoded false
+    @Override public boolean canBorrow()        { return canBorrow;   }
+    @Override public double  calculateLateFee() { return 0.5 * 30;   }
 
-    // ── LibraryItem ───────────────────────────────────────────────────────
-    @Override
-    public double calculateLateFee() { return 0.5 * 30; }
-
-    // ── Getters ───────────────────────────────────────────────────────────
     public String  getGenre()        { return genre;        }
     public String  getDeweyDecimal() { return deweyDecimal; }
     public boolean getBorrowable()   { return canBorrow;    }

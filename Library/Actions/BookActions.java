@@ -1,24 +1,18 @@
-package Library.actions;
+package Library.Actions;
 
 import DB.db;
+import Library.DomainClasses.Book;
 import Library.FormContext;
-import Library.book;
-
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-/**
- * Handles the "Add to Catalog" action for books.
- * Reads from FormContext, validates, calls db, updates the status label.
- */
 public class BookActions {
 
     private final FormContext ctx;
     private final JFrame      owner;
 
     public BookActions(FormContext ctx, JFrame owner) {
-        this.ctx   = ctx;
-        this.owner = owner;
+        this.ctx = ctx; this.owner = owner;
     }
 
     public void addRecord() {
@@ -36,7 +30,7 @@ public class BookActions {
         }
 
         db database = new db();
-        book newBook = new book(title, type, genre, dewey);
+        Book newBook = new Book(title, type, genre, dewey);
         boolean success = database.addBook(newBook);
 
         if (success) {

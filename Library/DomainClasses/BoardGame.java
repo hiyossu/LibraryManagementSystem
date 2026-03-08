@@ -1,5 +1,4 @@
-package Library;
-
+package Library.DomainClasses;
 
 public class BoardGame extends LibraryItem implements isBorrowable {
 
@@ -10,15 +9,9 @@ public class BoardGame extends LibraryItem implements isBorrowable {
         this.canBorrow = canBorrow;
     }
 
-    // ── isBorrowable ──────────────────────────────────────────────────────
-    @Override
-    public boolean canBorrow() { return canBorrow; }
+    @Override public boolean canBorrow()        { return canBorrow;  }
+    @Override public double  calculateLateFee() { return 3.0 * 5.0; }
 
-    // ── LibraryItem ───────────────────────────────────────────────────────
-    @Override
-    public double calculateLateFee() { return 3.0 * 5.0; }
-
-    // ── Setters ───────────────────────────────────────────────────────────
     public void setCanBorrow(boolean canBorrow) { this.canBorrow = canBorrow; }
 
     @Override

@@ -1,4 +1,4 @@
-package Library;
+package Library.DomainClasses;
 
 import java.time.LocalDate;
 
@@ -24,30 +24,24 @@ public class Book extends LibraryItem implements isBorrowable {
         this.canBorrow     = true;
     }
 
+    /** Convenience constructor used by the GUI form (no ISBN/author/pages/date). */
     public Book(String title, String type, String genre, String deweyDecimal) {
         this(title, type, genre, deweyDecimal, "", "", 0, LocalDate.now());
     }
 
-    // ── Getters ───────────────────────────────────────────────────────────
-    public String    getGenre()        { return genre;         }
-    public String    getDeweyDecimal() { return deweyDecimal;  }
-    public String    getIsbn()         { return isbn;          }
-    public String    getAuthor()       { return author;        }
-    public int       getPages()        { return pages;         }
-    public LocalDate getYearPublished(){ return yearPublished; }
+    @Override public boolean canBorrow()         { return canBorrow;     }
+    @Override public double  calculateLateFee()  { return 10.0;          }
 
-    // ── isBorrowable ──────────────────────────────────────────────────────
-    @Override
-    public boolean canBorrow() { return canBorrow; }
-
-    // ── LibraryItem ───────────────────────────────────────────────────────
-    @Override
-    public double calculateLateFee() { return 10.0; }
+    public String    getGenre()         { return genre;         }
+    public String    getDeweyDecimal()  { return deweyDecimal;  }
+    public String    getIsbn()          { return isbn;          }
+    public String    getAuthor()        { return author;        }
+    public int       getPages()         { return pages;         }
+    public LocalDate getYearPublished() { return yearPublished; }
 
     @Override
     public String toString() {
-        return "book{title='" + getTitle() + "', author='" + author
+        return "Book{title='" + getTitle() + "', author='" + author
              + "', dewey='" + deweyDecimal + "'}";
     }
 }
-

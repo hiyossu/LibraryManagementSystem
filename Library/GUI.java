@@ -1,13 +1,12 @@
 package Library;
 
-import Library.actions.BoardGameActions;
-import Library.actions.BookActions;
-import Library.actions.DvdActions;
-import Library.forms.BoardGameFormCard;
-import Library.forms.BookFormCard;
-import Library.forms.DvdFormCard;
-import Library.ui.UIFactory;
-
+import Library.Actions.BoardGameActions;
+import Library.Actions.BookActions;
+import Library.Actions.DvdActions;
+import Library.Forms.BoardGameFormCard;
+import Library.Forms.BookFormCard;
+import Library.Forms.DvdFormCard;
+import Library.UI.UIFactory;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -15,7 +14,6 @@ import java.io.InputStream;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.*;
-import java.time.LocalDate;
 
 public class GUI extends JFrame {
 
@@ -36,21 +34,17 @@ public class GUI extends JFrame {
     private final Color fieldBg      = new Color(16, 4, 4);
     private final Color fieldBorder  = new Color(74, 24, 24);
 
-    // ── Shared infrastructure ─────────────────────────────────────────────
     private FormContext ctx;
     private UIFactory   ui;
 
-    // ── Swappable layout references ───────────────────────────────────────
     private JPanel cardContainer;
     private JLabel pageTitle;
     private JLabel crumb;
 
-    // ── Sidebar nav buttons (kept so we can toggle active state) ─────────
     private JPanel navBtnBook;
     private JPanel navBtnDvd;
     private JPanel navBtnBoardGame;
 
-    // ── Logos ─────────────────────────────────────────────────────────────
     private ImageIcon iconEmblem;
     private ImageIcon iconText;
 
@@ -63,12 +57,9 @@ public class GUI extends JFrame {
 
     public GUI() {
         loadLogos();
-
-        // Build shared infrastructure first
         ui  = new UIFactory(gold, darkGold, red, textColor, grayText,
                             divColor, panelColor, cardColor, fieldBg, fieldBorder);
-        ctx = new FormContext(null,   // lblStatus wired in buildMainPanel()
-                              successColor, warnColor, errColor, grayText);
+        ctx = new FormContext(null, successColor, warnColor, errColor, grayText);
 
         setTitle("Mapua Cardinal Library - Makati");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -186,10 +177,8 @@ public class GUI extends JFrame {
         } else {
             JLabel fb = new JLabel("🏛");
             fb.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 48));
-            fb.setForeground(gold);
-            fb.setAlignmentX(Component.CENTER_ALIGNMENT);
-            logoArea.add(fb);
-            logoArea.add(Box.createVerticalStrut(6));
+            fb.setForeground(gold); fb.setAlignmentX(Component.CENTER_ALIGNMENT);
+            logoArea.add(fb); logoArea.add(Box.createVerticalStrut(6));
         }
 
         if (iconText != null) {
@@ -200,21 +189,17 @@ public class GUI extends JFrame {
         } else {
             JLabel lbl = new JLabel("Mapua University");
             lbl.setFont(new Font("Georgia", Font.BOLD, 13));
-            lbl.setForeground(red);
-            lbl.setAlignmentX(Component.CENTER_ALIGNMENT);
+            lbl.setForeground(red); lbl.setAlignmentX(Component.CENTER_ALIGNMENT);
             logoArea.add(lbl);
         }
 
         JLabel campus = new JLabel("Cardinal Library · Makati");
         campus.setFont(new Font("Georgia", Font.ITALIC, 10));
-        campus.setForeground(grayText);
-        campus.setAlignmentX(Component.CENTER_ALIGNMENT);
-        logoArea.add(campus);
-        logoArea.add(Box.createVerticalStrut(10));
+        campus.setForeground(grayText); campus.setAlignmentX(Component.CENTER_ALIGNMENT);
+        logoArea.add(campus); logoArea.add(Box.createVerticalStrut(10));
 
         JPanel stripe = new JPanel(new GridLayout(1, 2));
-        stripe.setMaximumSize(new Dimension(235, 3));
-        stripe.setPreferredSize(new Dimension(235, 3));
+        stripe.setMaximumSize(new Dimension(235, 3)); stripe.setPreferredSize(new Dimension(235, 3));
         JPanel g1 = new JPanel(); g1.setBackground(gold);
         JPanel g2 = new JPanel(); g2.setBackground(red);
         stripe.add(g1); stripe.add(g2);
@@ -228,30 +213,25 @@ public class GUI extends JFrame {
         footer.setBorder(new EmptyBorder(12, 20, 16, 20));
         footer.setMaximumSize(new Dimension(235, 60));
         JLabel admin = new JLabel("ADMIN SESSION");
-        admin.setFont(new Font("Monospaced", Font.BOLD, 10));
-        admin.setForeground(gold);
+        admin.setFont(new Font("Monospaced", Font.BOLD, 10)); admin.setForeground(gold);
         footer.add(admin, BorderLayout.NORTH);
         JLabel ver = new JLabel("LMS v2.0  2025");
-        ver.setFont(new Font("Dialog", Font.PLAIN, 10));
-        ver.setForeground(grayText);
+        ver.setFont(new Font("Dialog", Font.PLAIN, 10)); ver.setForeground(grayText);
         footer.add(ver, BorderLayout.SOUTH);
         return footer;
     }
 
     // ─────────────────────────────────────────────────────────────────────
-    //  NAV BUTTON
+    //  NAV HELPERS
     // ─────────────────────────────────────────────────────────────────────
     private JPanel makeDividerLabel(String text) {
         JPanel p = new JPanel(new BorderLayout());
-        p.setBackground(sidebarColor);
-        p.setMaximumSize(new Dimension(235, 30));
+        p.setBackground(sidebarColor); p.setMaximumSize(new Dimension(235, 30));
         p.setBorder(new EmptyBorder(8, 20, 2, 20));
         JLabel lbl = new JLabel(text);
-        lbl.setFont(new Font("Dialog", Font.BOLD, 9));
-        lbl.setForeground(grayText);
+        lbl.setFont(new Font("Dialog", Font.BOLD, 9)); lbl.setForeground(grayText);
         p.add(lbl, BorderLayout.CENTER);
-        JSeparator sep = new JSeparator();
-        sep.setForeground(divColor);
+        JSeparator sep = new JSeparator(); sep.setForeground(divColor);
         p.add(sep, BorderLayout.SOUTH);
         return p;
     }
@@ -295,8 +275,7 @@ public class GUI extends JFrame {
     }
 
     private boolean isActiveBtn(JPanel btn) {
-        return btn.getBackground().equals(cardColor)
-            && btn.getBorder() instanceof CompoundBorder;
+        return btn.getBackground().equals(cardColor) && btn.getBorder() instanceof CompoundBorder;
     }
 
     private void setNavActive(JPanel btn, boolean active) {
@@ -325,8 +304,7 @@ public class GUI extends JFrame {
         pageTitle.setText("Add New Book Record");
         crumb.setText("Library Catalog / Add Book");
         BookActions actions = new BookActions(ctx, this);
-        swapFormCard(new BookFormCard(ctx, ui, gold, red, cardColor,
-            divColor, grayText, textColor)
+        swapFormCard(new BookFormCard(ctx, ui, gold, red, cardColor, divColor, grayText, textColor)
             .build(actions::addRecord, ctx::clearFields, this::displayDashboard));
     }
 
@@ -337,8 +315,7 @@ public class GUI extends JFrame {
         pageTitle.setText("Add New DVD Record");
         crumb.setText("Library Catalog / Add DVD");
         DvdActions actions = new DvdActions(ctx, this);
-        swapFormCard(new DvdFormCard(ctx, ui, gold, red, cardColor,
-            divColor, grayText, textColor)
+        swapFormCard(new DvdFormCard(ctx, ui, gold, red, cardColor, divColor, grayText, textColor)
             .build(actions::addRecord, ctx::clearFields, this::displayDashboard));
     }
 
@@ -349,8 +326,7 @@ public class GUI extends JFrame {
         pageTitle.setText("Add New Board Game Record");
         crumb.setText("Library Catalog / Add Board Game");
         BoardGameActions actions = new BoardGameActions(ctx, this);
-        swapFormCard(new BoardGameFormCard(ctx, ui, gold, cardColor,
-            divColor, grayText, textColor)
+        swapFormCard(new BoardGameFormCard(ctx, ui, gold, cardColor, divColor, grayText, textColor)
             .build(actions::addRecord, ctx::clearFields, this::displayDashboard));
     }
 
@@ -368,7 +344,6 @@ public class GUI extends JFrame {
         JPanel main = new JPanel(new BorderLayout());
         main.setBackground(bgColor);
 
-        // Top bar
         JPanel topBar = new JPanel(new BorderLayout());
         topBar.setBackground(panelColor);
         topBar.setPreferredSize(new Dimension(0, 54));
@@ -376,27 +351,20 @@ public class GUI extends JFrame {
             BorderFactory.createMatteBorder(0, 0, 2, 0, red),
             new EmptyBorder(0, 24, 0, 24)));
         pageTitle = new JLabel("Add New Book Record");
-        pageTitle.setFont(new Font("Georgia", Font.BOLD, 17));
-        pageTitle.setForeground(textColor);
+        pageTitle.setFont(new Font("Georgia", Font.BOLD, 17)); pageTitle.setForeground(textColor);
         topBar.add(pageTitle, BorderLayout.CENTER);
         crumb = new JLabel("Library Catalog / Add Book");
-        crumb.setFont(new Font("Dialog", Font.PLAIN, 11));
-        crumb.setForeground(grayText);
+        crumb.setFont(new Font("Dialog", Font.PLAIN, 11)); crumb.setForeground(grayText);
         topBar.add(crumb, BorderLayout.EAST);
         main.add(topBar, BorderLayout.NORTH);
 
-        // Card container (swappable center)
         cardContainer = new JPanel(new GridBagLayout());
         cardContainer.setBackground(bgColor);
-
-        // Wire the initial Book form
         BookActions bookActions = new BookActions(ctx, this);
-        cardContainer.add(new BookFormCard(ctx, ui, gold, red, cardColor,
-            divColor, grayText, textColor)
+        cardContainer.add(new BookFormCard(ctx, ui, gold, red, cardColor, divColor, grayText, textColor)
             .build(bookActions::addRecord, ctx::clearFields, this::displayDashboard));
         main.add(cardContainer, BorderLayout.CENTER);
 
-        // Status bar
         JPanel statusBar = new JPanel(new BorderLayout());
         statusBar.setBackground(sidebarColor);
         statusBar.setPreferredSize(new Dimension(0, 32));
@@ -404,14 +372,11 @@ public class GUI extends JFrame {
             BorderFactory.createMatteBorder(1, 0, 0, 0, divColor),
             new EmptyBorder(0, 20, 0, 20)));
         JLabel lblStatus = new JLabel("System ready");
-        lblStatus.setFont(new Font("Monospaced", Font.PLAIN, 11));
-        lblStatus.setForeground(grayText);
+        lblStatus.setFont(new Font("Monospaced", Font.PLAIN, 11)); lblStatus.setForeground(grayText);
         statusBar.add(lblStatus, BorderLayout.CENTER);
-        ctx.lblStatus = lblStatus;   // wire into shared context NOW that it exists
-
+        ctx.lblStatus = lblStatus;   // wire status label into context now that it exists
         JLabel brand = new JLabel("Mapua Cardinal Library LMS");
-        brand.setFont(new Font("Dialog", Font.PLAIN, 10));
-        brand.setForeground(grayText);
+        brand.setFont(new Font("Dialog", Font.PLAIN, 10)); brand.setForeground(grayText);
         statusBar.add(brand, BorderLayout.EAST);
         main.add(statusBar, BorderLayout.SOUTH);
 
@@ -419,7 +384,7 @@ public class GUI extends JFrame {
     }
 
     // ─────────────────────────────────────────────────────────────────────
-    //  MISC ACTIONS  (stay in GUI since they touch the frame directly)
+    //  MISC ACTIONS
     // ─────────────────────────────────────────────────────────────────────
     private void displayDashboard() {
         ctx.lblStatus.setForeground(gold);
@@ -428,163 +393,12 @@ public class GUI extends JFrame {
             "Dashboard", JOptionPane.INFORMATION_MESSAGE);
     }
 
-<<<<<<< HEAD
     private void showAbout() {
-=======
-    private void addRow(JPanel p, GridBagConstraints fc, String labelText, JTextField field, int row) {
-        fc.gridy = row; fc.gridx = 0; fc.weightx = 0; fc.gridwidth = 1;
-        fc.insets = new Insets(8, 0, 8, 10);
-        JLabel lbl = new JLabel(labelText);
-        lbl.setFont(new Font("Dialog", Font.BOLD, 11));
-        lbl.setForeground(grayText);
-        lbl.setPreferredSize(new Dimension(95, 20));
-        p.add(lbl, fc);
-
-        fc.gridx = 1; fc.weightx = 1; fc.gridwidth = 3;
-        fc.insets = new Insets(8, 0, 8, 0);
-        p.add(field, fc);
-    }
-
-    private JTextField makeField(String placeholder) {
-        JTextField tf = new JTextField() {
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                if (getText().isEmpty() && !isFocusOwner()) {
-                    Graphics2D g2 = (Graphics2D) g.create();
-                    g2.setColor(grayText);
-                    g2.setFont(new Font("Dialog", Font.ITALIC, 12));
-                    Insets ins = getInsets();
-                    FontMetrics fm = g2.getFontMetrics();
-                    int y = ins.top + (getHeight() - ins.top - ins.bottom - fm.getHeight()) / 2 + fm.getAscent();
-                    g2.drawString(placeholder, ins.left + 4, y);
-                    g2.dispose();
-                }
-            }
-        };
-        tf.setFont(new Font("Dialog", Font.PLAIN, 13));
-        tf.setForeground(textColor);
-        tf.setBackground(fieldBg);
-        tf.setCaretColor(gold);
-        tf.setPreferredSize(new Dimension(0, 36));
-        tf.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(fieldBorder, 1),
-            new EmptyBorder(4, 10, 4, 10)));
-        tf.addFocusListener(new FocusAdapter() {
-            public void focusGained(FocusEvent e) {
-                tf.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(gold, 1), new EmptyBorder(4, 10, 4, 10)));
-                tf.repaint();
-            }
-            public void focusLost(FocusEvent e) {
-                tf.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(fieldBorder, 1), new EmptyBorder(4, 10, 4, 10)));
-                tf.repaint();
-            }
-        });
-        return tf;
-    }
-
-    private JButton makePrimaryButton(String text) {
-        JButton btn = new JButton(text) {
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                if      (getModel().isPressed())  g2.setColor(darkGold);
-                else if (getModel().isRollover()) g2.setColor(new Color(220, 172, 32));
-                else                              g2.setColor(gold);
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 6, 6);
-                g2.dispose();
-                super.paintComponent(g);
-            }
-        };
-        btn.setFont(new Font("Dialog", Font.BOLD, 13));
-        btn.setForeground(new Color(21, 7, 7));
-        btn.setOpaque(false); btn.setContentAreaFilled(false);
-        btn.setBorderPainted(false); btn.setFocusPainted(false);
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btn.setPreferredSize(new Dimension(155, 38));
-        return btn;
-    }
-
-    private JButton makeOutlineButton(String text) {
-        JButton btn = new JButton(text) {
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                if      (getModel().isPressed())  g2.setColor(divColor);
-                else if (getModel().isRollover()) g2.setColor(panelColor);
-                else                              g2.setColor(cardColor);
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 6, 6);
-                g2.setColor(fieldBorder);
-                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 6, 6);
-                g2.dispose();
-                super.paintComponent(g);
-            }
-        };
-        btn.setFont(new Font("Dialog", Font.PLAIN, 13));
-        btn.setForeground(textColor);
-        btn.setOpaque(false); btn.setContentAreaFilled(false);
-        btn.setBorderPainted(false); btn.setFocusPainted(false);
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btn.setPreferredSize(new Dimension(110, 38));
-        return btn;
-    }
-
-    // ─────────────────────────────────────────────────────────────
-    //  ACTIONS
-    // ─────────────────────────────────────────────────────────────
-    public void addRecords() {
-        String title = txtTitle.getText().trim();
-        String type  = txtType.getText().trim();
-        String genre = txtGenre.getText().trim();
-        String dewey = txtDewey.getText().trim();
-
-        if (title.isEmpty() || type.isEmpty() || genre.isEmpty() || dewey.isEmpty()) {
-            lblStatus.setForeground(warnColor);
-            lblStatus.setText("Please fill in all fields.");
-            JOptionPane.showMessageDialog(this, "Please complete all fields.", "Warning", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        db database = new db();
-        Book newBook = new Book(title, type, genre, dewey,
-                                "N/A", "N/A", 0, LocalDate.now());
-        boolean success = database.addBook(newBook);
-        if (success) {
-            lblStatus.setForeground(successColor);
-            lblStatus.setText("Added: \"" + title + "\" successfully.");
-            clearFields();
-        } else {
-            lblStatus.setForeground(errColor);
-            lblStatus.setText("Database error. Check console.");
-        }
-        database.closeConnection();
-    }
-
-    public void displayDashboard() {
-        lblStatus.setForeground(gold);
-        lblStatus.setText("Dashboard coming soon.");
-        JOptionPane.showMessageDialog(this, "Dashboard is under construction.", "Dashboard", JOptionPane.INFORMATION_MESSAGE);
-    }
-
-    public void clearFields() {
-        txtTitle.setText(""); txtType.setText("");
-        txtGenre.setText(""); txtDewey.setText("");
-        lblStatus.setForeground(grayText);
-        lblStatus.setText("Fields cleared.");
-    }
-
-    public void showAbout() {
-        // Build a custom dialog with both logos
->>>>>>> 02fd976b27e71526cd848b78bacca822263fcd54
         JDialog dlg = new JDialog(this, "About", true);
-        dlg.setSize(380, 280);
-        dlg.setLocationRelativeTo(this);
-        dlg.setResizable(false);
+        dlg.setSize(380, 280); dlg.setLocationRelativeTo(this); dlg.setResizable(false);
 
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(cardColor);
-        panel.setBorder(new EmptyBorder(24, 30, 24, 30));
+        panel.setBackground(cardColor); panel.setBorder(new EmptyBorder(24, 30, 24, 30));
 
         JPanel logoRow = new JPanel(new FlowLayout(FlowLayout.CENTER, 14, 0));
         logoRow.setBackground(cardColor);
@@ -594,16 +408,14 @@ public class GUI extends JFrame {
 
         JPanel info = new JPanel();
         info.setLayout(new BoxLayout(info, BoxLayout.Y_AXIS));
-        info.setBackground(cardColor);
-        info.setBorder(new EmptyBorder(18, 0, 12, 0));
+        info.setBackground(cardColor); info.setBorder(new EmptyBorder(18, 0, 12, 0));
         for (String line : new String[]{
                 "Mapua Cardinal Library — Makati Campus",
                 "Library Management System v2.0", "",
                 "Mapua University  |  Est. 1925"}) {
             JLabel l = new JLabel(line.isEmpty() ? " " : line);
             l.setFont(line.contains("v2.0") || line.isEmpty()
-                ? new Font("Dialog", Font.PLAIN, 12)
-                : new Font("Georgia", Font.BOLD, 13));
+                ? new Font("Dialog", Font.PLAIN, 12) : new Font("Georgia", Font.BOLD, 13));
             l.setForeground(line.contains("Est.") ? gold : textColor);
             l.setAlignmentX(Component.CENTER_ALIGNMENT);
             info.add(l);
@@ -614,8 +426,7 @@ public class GUI extends JFrame {
         ok.setPreferredSize(new Dimension(90, 34));
         ok.addActionListener(e -> dlg.dispose());
         JPanel btnRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        btnRow.setBackground(cardColor);
-        btnRow.add(ok);
+        btnRow.setBackground(cardColor); btnRow.add(ok);
         panel.add(btnRow, BorderLayout.SOUTH);
 
         dlg.setContentPane(panel);
