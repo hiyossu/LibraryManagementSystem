@@ -1,4 +1,4 @@
-package Library;
+package Library.Logic;
 import java.time.LocalDate;
 
 public class ExceptionHandler {

@@ -1,4 +1,4 @@
-package Library; 
+package Library;
 
 public interface isBorrowable {
     boolean canBorrow();
