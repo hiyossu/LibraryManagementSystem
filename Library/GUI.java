@@ -554,7 +554,7 @@ public class GUI extends JFrame {
         }
 
         db database = new db();
-        book newBook = new book(title, type, genre, dewey);
+        Book newBook = new Book(title, type, genre, dewey);
         boolean success = database.addBook(newBook);
         if (success) {
             lblStatus.setForeground(successColor);

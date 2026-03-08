@@ -1,15 +1,16 @@
 package Library;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DataVal {
+public class DataValidation {
 
     private List<String> errorList;
     private List<String> validationRules;
 
     // Constructor
-    public DataVal() {
+    public DataValidation() {
         errorList = new ArrayList<>();
         validationRules = new ArrayList<>();
 
@@ -47,7 +48,7 @@ public class DataVal {
 
     // checkConstraints
     public boolean checkConstraints(String isbn, String title, String author,
-                                    String ddsCode, int pages, java.util.Date yearPublished) {
+                                    String ddsCode, int pages, LocalDate yearPublished) {
         clearErrors();
 
         // ISBN 
@@ -89,7 +90,7 @@ public class DataVal {
         // Year Published 
         if (yearPublished == null) {
             errorList.add("Year Published is required.");
-        } else if (yearPublished.after(new java.util.Date())) {
+        } else if (!isYearPublishedValid(yearPublished)) {
             errorList.add("Year Published cannot be a future date.");
         }
 
@@ -124,5 +125,9 @@ public class DataVal {
 
     public boolean isValid() {
         return errorList.isEmpty();
+    }
+
+    public boolean isYearPublishedValid(LocalDate publishDate) {
+        return !publishDate.isAfter(LocalDate.now());
     }
 }

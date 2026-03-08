@@ -27,7 +27,7 @@ public static void main(String[] args) {
             System.out.print("Dewey Decimal: ");
             String deweyDecimal = scanner.nextLine();
 
-            book book1 = new book(title, type, genre, deweyDecimal);
+            Book book1 = new Book(title, type, genre, deweyDecimal);
             System.out.println("\nSuccessfully added: " + book1.getTitle());
         }
     }

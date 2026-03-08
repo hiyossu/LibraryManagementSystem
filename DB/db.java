@@ -1,6 +1,6 @@
 package DB;
 
-import Library.book;
+import Library.Book;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,7 @@ public class db {
             System.out.println("Connection failed: " + e.getMessage());
         }
     }
-    public boolean addBook(book b) {
+    public boolean addBook(Book b) {
         String sql = "INSERT INTO Book (title, type, genre, deweyDecimal, canBorrow) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, b.getTitle());
