@@ -8,7 +8,6 @@ public class DataValidation {
 
     private List<String> errorList;
     private List<String> validationRules;
-<<<<<<< HEAD
     private String currentTitle;
     private String currentIsbn;
     private String currentAuthor;
@@ -17,18 +16,6 @@ public class DataValidation {
     private String currentType;
     private String currentGenre;
     private LocalDateTime currentYearPublished;
-=======
-
-    // Fields for the setInputFields / validateCurrentFields workflow
-    private String    currentTitle;
-    private String    currentIsbn;
-    private String    currentAuthor;
-    private String    currentDeweyDecimal;
-    private int       currentPages;
-    private String    currentType;
-    private String    currentGenre;
-    private LocalDate currentYearPublished;
->>>>>>> f264304e8dc198434381c9ba3b00fb3ebce89920
 
     public DataValidation() {
         errorList = new ArrayList<>();
@@ -54,34 +41,17 @@ public class DataValidation {
 
     // ── Full constraint check ─────────────────────────────────────────────
     public boolean checkConstraints(String isbn, String title, String author,
-<<<<<<< HEAD
                                     String ddsCode, int pages, LocalDateTime yearPublished, String type, String genre) {
-=======
-                                    String ddsCode, int pages, LocalDate yearPublished,
-                                    String type, String genre) {
->>>>>>> f264304e8dc198434381c9ba3b00fb3ebce89920
         clearErrors();
 
         if (isbn == null || !isbn.replaceAll("-", "").trim().matches("\\d{10}|\\d{13}"))
             errorList.add("ISBN must be 10 or 13 digits.");
-<<<<<<< HEAD
         if (title == null || title.trim().isEmpty()) errorList.add("Title is required.");
         if (author == null || author.trim().isEmpty()) errorList.add("Author is required.");
         if (ddsCode == null || !ddsCode.trim().matches("\\d{3}(\\.\\d+)?")) 
             errorList.add("DDS Code format error.");
         if (pages <= 0) errorList.add("Pages must be > 0.");
         if (yearPublished == null || yearPublished.isAfter(LocalDateTime.now())) 
-=======
-        if (title == null || title.trim().isEmpty())
-            errorList.add("Title is required.");
-        if (author == null || author.trim().isEmpty())
-            errorList.add("Author is required.");
-        if (ddsCode == null || !ddsCode.trim().matches("\\d{3}(\\.\\d+)?"))
-            errorList.add("DDS Code format error (e.g. 005, 005.13).");
-        if (pages <= 0)
-            errorList.add("Pages must be > 0.");
-        if (yearPublished == null || yearPublished.isAfter(LocalDate.now()))
->>>>>>> f264304e8dc198434381c9ba3b00fb3ebce89920
             errorList.add("Invalid publication date.");
         if (type == null || type.trim().isEmpty())
             errorList.add("Media Type is required.");
@@ -98,26 +68,12 @@ public class DataValidation {
         return true;
     }
 
-<<<<<<< HEAD
     public void setInputFields(String title, String type, String genre, String deweyDecimal, String isbn, String author, int pages, LocalDateTime yearPublished){
         this.currentIsbn = isbn;
         this.currentTitle = title;
         this.currentAuthor = author;
         this.currentDeweyDecimal = deweyDecimal;
         this.currentPages = pages;
-=======
-    // ── Stored-field workflow ─────────────────────────────────────────────
-    public void setInputFields(String title, String type, String genre,
-                               String deweyDecimal, String isbn, String author,
-                               int pages, LocalDate yearPublished) {
-        this.currentTitle         = title;
-        this.currentType          = type;
-        this.currentGenre         = genre;
-        this.currentDeweyDecimal  = deweyDecimal;
-        this.currentIsbn          = isbn;
-        this.currentAuthor        = author;
-        this.currentPages         = pages;
->>>>>>> f264304e8dc198434381c9ba3b00fb3ebce89920
         this.currentYearPublished = yearPublished;
     }
 
