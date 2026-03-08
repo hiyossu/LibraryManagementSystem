@@ -22,8 +22,8 @@ public class ExceptionHandler {
     public LocalDateTime getTimeGenerated() {
         return timeGenerated;
     }
- 
     public void logError() {
         System.err.println("[" + timeGenerated + "] ERROR " + errorCode + ": " + errorMessage);
     }
 }
+ s

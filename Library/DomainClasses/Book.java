@@ -1,5 +1,6 @@
 package Library.DomainClasses;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
  
 public class Book extends LibraryItem implements isBorrowable {
  
@@ -27,7 +28,6 @@ public class Book extends LibraryItem implements isBorrowable {
     public Book(String title, String type, String genre, String deweyDecimal) {
         this(title, type, genre, deweyDecimal, "", "", 0, LocalDateTime.now());
     }
- 
     // ── Getters ───────────────────────────────────────────────────────────
     public String    getGenre()        { return genre;         }
     public String    getDeweyDecimal() { return deweyDecimal;  }
@@ -35,18 +35,19 @@ public class Book extends LibraryItem implements isBorrowable {
     public String    getAuthor()       { return author;        }
     public int       getPages()        { return pages;         }
     public LocalDateTime getYearPublished(){ return yearPublished; }
- 
-    public String    getGenre()         { return genre;         }
-    public String    getDeweyDecimal()  { return deweyDecimal;  }
-    public String    getIsbn()          { return isbn;          }
-    public String    getAuthor()        { return author;        }
-    public int       getPages()         { return pages;         }
-    public LocalDate getYearPublished() { return yearPublished; }
- 
     @Override
     public String toString() {
         return "Book{title='" + getTitle() + "', author='" + author
              + "', dewey='" + deweyDecimal + "'}";
     }
+ 
+    @Override
+    public boolean canBorrow() { return canBorrow; }
+ 
+    @Override
+    public double calculateLateFee(long daysOverdue) {
+        return (daysOverdue > 0) ? (10.0 * daysOverdue) : 0.0;
+    }
+ 
 }
  

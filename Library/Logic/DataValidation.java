@@ -16,7 +16,7 @@ public class DataValidation {
     private String currentType;
     private String currentGenre;
     private LocalDateTime currentYearPublished;
- 
+   
     public DataValidation() {
         errorList = new ArrayList<>();
         validationRules = new ArrayList<>();
@@ -66,7 +66,6 @@ public class DataValidation {
         if (id <= 0) { errorList.add("ID must be a positive number."); return false; }
         return true;
     }
- 
     public void setInputFields(String title, String type, String genre, String deweyDecimal, String isbn, String author, int pages, LocalDateTime yearPublished){
         this.currentIsbn = isbn;
         this.currentTitle = title;

@@ -4,6 +4,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
  
+import Library.DomainClasses.Book;
+ 
 public class BorrowingSystem {
     private LocalDateTime dateBorrowed;
     private LocalDateTime dateReturned;
@@ -17,9 +19,9 @@ public class BorrowingSystem {
     public BorrowingSystem(LocalDateTime dateBorrowed, LocalDateTime dateReturned, LocalDateTime dueDate, String borrowedCondition){
         this.dateBorrowed = dateBorrowed;
         this.dateReturned = dateReturned;
-        this.dueDate = dateBorrowed.plusWeeks(1);
         this.borrowedCondition = borrowedCondition;
-        this.fineAmount = calculateOverdueFine();
+ 
+        this.dueDate = dateBorrowed.plusWeeks(1);  
  
         this.validator = new DataValidation();
     }
@@ -46,30 +48,27 @@ public class BorrowingSystem {
             }
     }
  
-    public void returnItem(){
+    public void returnItem(Book book){
+        this.fineAmount = calculateOverdueFine(book);
+ 
         System.out.println("Item returned on: " + dateReturned);
         System.out.println("Condition upon return: " + borrowedCondition);
         System.out.println("Fine amount: Php " + fineAmount);
     }
  
-    public double calculateOverdueFine(){
+ 
+    public double calculateOverdueFine(Book book) {
         long daysOverdue = ChronoUnit.DAYS.between(dueDate, dateReturned);
-        if (daysOverdue > 0) {
-            return daysOverdue * 10;
-        }
-        return 0;
+        return book.calculateLateFee(daysOverdue);
     }
  
     public static void main(String[] args) {
+        Book myBook = new Book("Java Logic", "Book", "Programming", "005.1", "1234567890", "Author", 250, LocalDateTime.now());
+        LocalDateTime lastWeek = LocalDateTime.now().minusWeeks(1);
         LocalDateTime today = LocalDateTime.now();
-        LocalDateTime lastWeek = today.minusWeeks(1);
-        LocalDateTime yesterday = today.minusDays(1);
+        BorrowingSystem session = new BorrowingSystem(lastWeek, today, lastWeek.plusWeeks(1),"Good");
  
-        BorrowingSystem session = new BorrowingSystem(lastWeek, today, yesterday, "Good");
-       
-        session.checkout("1234567890", "Java Logic", "Author Name", "005.1", 250, LocalDateTime.of(2025, 1, 1, 0, 0), "Book", "Programming");
-        System.out.println("---");
-        session.returnItem();
+        double fine = session.calculateOverdueFine(myBook);
+        System.out.println("Total Fine: Php " + fine);
     }
 }
- 
