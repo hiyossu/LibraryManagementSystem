@@ -1,6 +1,6 @@
 package Library.DomainClasses;
 
-public class ReferenceBook extends LibraryItem implements isBorrowable {
+public abstract class ReferenceBook extends LibraryItem implements isBorrowable {
 
     private String    genre;
     private String    deweyDecimal;

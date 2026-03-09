@@ -1,0 +1,74 @@
+package Library.Logic;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
+ 
+import Library.DomainClasses.Book;
+ 
+public class BorrowingSystem {
+    private LocalDateTime dateBorrowed;
+    private LocalDateTime dateReturned;
+    private LocalDateTime dueDate;
+    private String borrowedCondition;
+    private double fineAmount = 0.0;
+ 
+    private DataValidation validator;
+    private List<ExceptionHandler> exceptionHandlers =  new ArrayList<>();
+ 
+    public BorrowingSystem(LocalDateTime dateBorrowed, LocalDateTime dateReturned, LocalDateTime dueDate, String borrowedCondition){
+        this.dateBorrowed = dateBorrowed;
+        this.dateReturned = dateReturned;
+        this.borrowedCondition = borrowedCondition;
+ 
+        this.dueDate = dateBorrowed.plusWeeks(1);  
+ 
+        this.validator = new DataValidation();
+    }
+ 
+    private void showErrors(){
+        for(ExceptionHandler eh : exceptionHandlers){
+            eh.logError();
+        }
+    }
+ 
+    public void checkout(String isbn, String title, String author, String ddsCode, int pages, LocalDateTime yearPublished, String type, String genre){
+        exceptionHandlers.clear();
+        boolean isValid = validator.checkConstraints(isbn, title, author, ddsCode, pages, yearPublished, type, genre);
+        if(!isValid){
+            for(String errorMsg : validator.getErrors()){
+                exceptionHandlers.add(new ExceptionHandler(1000, errorMsg));
+            }
+ 
+            showErrors();}
+            else{
+                System.out.println("Checkout succesful!");
+                System.out.println("Checkout date: " + dateBorrowed);
+                System.out.println("Due date: " + dueDate);
+            }
+    }
+ 
+    public void returnItem(Book book){
+        this.fineAmount = calculateOverdueFine(book);
+ 
+        System.out.println("Item returned on: " + dateReturned);
+        System.out.println("Condition upon return: " + borrowedCondition);
+        System.out.println("Fine amount: Php " + fineAmount);
+    }
+ 
+ 
+    public double calculateOverdueFine(Book book) {
+        long daysOverdue = ChronoUnit.DAYS.between(dueDate, dateReturned);
+        return book.calculateLateFee(daysOverdue);
+    }
+ 
+    public static void main(String[] args) {
+        Book myBook = new Book("Java Logic", "Book", "Programming", "005.1", "1234567890", "Author", 250, LocalDateTime.now());
+        LocalDateTime lastWeek = LocalDateTime.now().minusWeeks(1);
+        LocalDateTime today = LocalDateTime.now();
+        BorrowingSystem session = new BorrowingSystem(lastWeek, today, lastWeek.plusWeeks(1),"Good");
+ 
+        double fine = session.calculateOverdueFine(myBook);
+        System.out.println("Total Fine: Php " + fine);
+    }
+}

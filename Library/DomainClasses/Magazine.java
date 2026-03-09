@@ -1,6 +1,6 @@
 package Library.DomainClasses;
 
-public class Magazine extends LibraryItem implements isBorrowable {
+public abstract class  Magazine extends LibraryItem implements isBorrowable {
 
     private String    genre;
     protected boolean canBorrow;
