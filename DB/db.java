@@ -79,7 +79,7 @@ public class db {
     }
 
     public List<String> getAllBooks() {
-        List<String> books = new ArrayList<String>();
+        List<String> books = new ArrayList<>();
         String sql = "SELECT * FROM Book";
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -99,7 +99,7 @@ public class db {
     }
 
     public List<String> searchBook(String keyword) {
-        List<String> results = new ArrayList<String>();
+        List<String> results = new ArrayList<>();
         String sql = "SELECT * FROM Book WHERE title LIKE ? OR genre LIKE ? OR type LIKE ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             String kw = "%" + keyword + "%";
@@ -197,7 +197,7 @@ public class db {
     }
 
     public List<String> getAllBorrowers() {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         String sql = "SELECT * FROM Borrower";
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -344,7 +344,7 @@ public class db {
 
     /** Get all active (unreturned) loans for a specific borrower */
     public List<String> getActiveLoansByBorrower(int borrowerIdNo) {
-        List<String> loans = new ArrayList<String>();
+        List<String> loans = new ArrayList<>();
         String sql = "SELECT bs.id, b.title, bs.dateBorrowed, bs.dueDate " +
                      "FROM BorrowingSystem bs JOIN Book b ON bs.bookId = b.id " +
                      "WHERE bs.borrowerIdNo=? AND bs.dateReturned IS NULL " +
@@ -369,7 +369,7 @@ public class db {
      * Used by the student My Loans > Borrow History table.
      */
     public List<String> getBorrowHistoryForBorrower(int borrowerIdNo) {
-        List<String> history = new ArrayList<String>();
+        List<String> history = new ArrayList<>();
         String sql = "SELECT bs.id, b.title, bs.dateBorrowed, bs.dateReturned " +
                      "FROM BorrowingSystem bs JOIN Book b ON bs.bookId = b.id " +
                      "WHERE bs.borrowerIdNo = ? AND bs.dateReturned IS NOT NULL " +
@@ -396,7 +396,7 @@ public class db {
      * Sorted by dueDate ASC so overdue rows appear first.
      */
     public List<String> getAllActiveLoans() {
-        List<String> loans = new ArrayList<String>();
+        List<String> loans = new ArrayList<>();
         String sql = "SELECT bs.id, br.idNo, br.name, b.title, bs.dateBorrowed, bs.dueDate " +
                      "FROM BorrowingSystem bs " +
                      "JOIN Book b     ON bs.bookId       = b.id " +
@@ -455,7 +455,7 @@ public class db {
      * joined with borrower name and book title, sorted most overdue first.
      */
     public List<String> getOverdueLoans() {
-        List<String> loans = new ArrayList<String>();
+        List<String> loans = new ArrayList<>();
         String sql =
             "SELECT bs.id, br.idNo, br.name, b.title, bs.dateBorrowed, bs.dueDate, " +
             "       DATEDIFF(CURDATE(), bs.dueDate) AS daysOverdue " +
@@ -499,7 +499,7 @@ public class db {
     }
 
     public List<String> getNotificationsForBorrower(int borrowerIdNo) {
-        List<String> notes = new ArrayList<String>();
+        List<String> notes = new ArrayList<>();
         String sql = "SELECT id, message, sentDate FROM Notification WHERE borrowerIdNo=? ORDER BY sentDate DESC";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, borrowerIdNo);
@@ -541,7 +541,7 @@ public class db {
     }
 
     public List<String> validateBookInput(String title, String type, String genre, String dewey) {
-        List<String> errors = new ArrayList<String>();
+        List<String> errors = new ArrayList<>();
         if (title  == null || title.trim().isEmpty())  errors.add("Title is required.");
         if (type   == null || type.trim().isEmpty())   errors.add("Media type is required.");
         if (genre  == null || genre.trim().isEmpty())  errors.add("Genre is required.");
@@ -590,7 +590,7 @@ public class db {
     }
 
     public List<String> getExceptionLog() {
-        List<String> log = new ArrayList<String>();
+        List<String> log = new ArrayList<>();
         String sql = "SELECT * FROM ExceptionLog ORDER BY timeGenerated DESC";
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {

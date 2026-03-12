@@ -17,24 +17,24 @@ import javax.swing.table.*;
 public class GUI extends JFrame {
 
     // ── Palette ────────────────────────────────────────────────────────
-    private Color bgColor     = new Color(13,  10,  10);
-    private Color sidebarColor= new Color(18,   5,   5);
-    private Color panelColor  = new Color(30,   8,   8);
-    private Color cardColor   = new Color(34,  12,  12);
-    private Color gold        = new Color(212, 160,  23);
-    private Color darkGold    = new Color(154, 114,  10);
-    private Color red         = new Color(190,  16,  16);
-    private Color textColor   = new Color(245, 236, 220);
-    private Color grayText    = new Color(136, 120, 104);
-    private Color divColor    = new Color( 58,  20,  20);
-    private Color successColor= new Color(107, 181, 114);
-    private Color warnColor   = new Color(232, 168,  64);
-    private Color errColor    = new Color(192,  80,  80);
-    private Color fieldBg     = new Color( 16,   4,   4);
-    private Color fieldBorder = new Color( 74,  24,  24);
-    private Color tableBg     = new Color( 22,   7,   7);
-    private Color tableAlt    = new Color( 28,   9,   9);
-    private Color tableHeader = new Color( 50,  15,  15);
+    private final Color bgColor     = new Color(13,  10,  10);
+    private final Color sidebarColor= new Color(18,   5,   5);
+    private final Color panelColor  = new Color(30,   8,   8);
+    private final Color cardColor   = new Color(34,  12,  12);
+    private final Color gold        = new Color(212, 160,  23);
+    private final Color darkGold    = new Color(154, 114,  10);
+    private final Color red         = new Color(190,  16,  16);
+    private final Color textColor   = new Color(245, 236, 220);
+    private final Color grayText    = new Color(136, 120, 104);
+    private final Color divColor    = new Color( 58,  20,  20);
+    private final Color successColor= new Color(107, 181, 114);
+    private final Color warnColor   = new Color(232, 168,  64);
+    private final Color errColor    = new Color(192,  80,  80);
+    private final Color fieldBg     = new Color( 16,   4,   4);
+    private final Color fieldBorder = new Color( 74,  24,  24);
+    private final Color tableBg     = new Color( 22,   7,   7);
+    private final Color tableAlt    = new Color( 28,   9,   9);
+    private final Color tableHeader = new Color( 50,  15,  15);
 
     // ── Shared validation instance ─────────────────────────────────────
     private final DataValidation validator = new DataValidation();

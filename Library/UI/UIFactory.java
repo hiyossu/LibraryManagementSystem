@@ -36,6 +36,7 @@ public class UIFactory {
 
     public JTextField makeField(String placeholder) {
         JTextField tf = new JTextField() {
+            @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 if (getText().isEmpty() && !isFocusOwner()) {
@@ -59,11 +60,13 @@ public class UIFactory {
             BorderFactory.createLineBorder(fieldBorder, 1),
             new EmptyBorder(4, 10, 4, 10)));
         tf.addFocusListener(new FocusAdapter() {
+            @Override
             public void focusGained(FocusEvent e) {
                 tf.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createLineBorder(gold, 1), new EmptyBorder(4, 10, 4, 10)));
                 tf.repaint();
             }
+            @Override
             public void focusLost(FocusEvent e) {
                 tf.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createLineBorder(fieldBorder, 1), new EmptyBorder(4, 10, 4, 10)));
@@ -89,6 +92,7 @@ public class UIFactory {
 
     public JButton makePrimaryButton(String text) {
         JButton btn = new JButton(text) {
+            @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -111,6 +115,7 @@ public class UIFactory {
 
     public JButton makeOutlineButton(String text) {
         JButton btn = new JButton(text) {
+            @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
