@@ -1,9 +1,8 @@
 package Library;
 
-import DB.db;
+import Database.db;
 import Library.Logic.DataValidation;
 import Library.Logic.ExceptionHandler;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -1446,7 +1445,6 @@ public class GUI extends JFrame {
                 return;
             }
         } else {
-            // Guest — just needs to be a positive integer
             int guestId;
             try { guestId = Integer.parseInt(idStr); }
             catch (NumberFormatException ex) {

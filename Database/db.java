@@ -1,4 +1,4 @@
-package DB;
+package Database;
 
 import Library.DomainClasses.Book;
 import java.sql.*;
