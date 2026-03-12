@@ -50,7 +50,7 @@ public class db {
             stmt.setString(2, b.getType());
             stmt.setString(3, b.getGenre());
             stmt.setString(4, b.getDeweyDecimal());
-            stmt.setBoolean(5, b.getBorrowable());
+            stmt.setBoolean(5, !b.getType().equals("ReferenceBook"));
             stmt.executeUpdate();
             System.out.println("Book saved to database: " + b.getTitle());
             return true;
